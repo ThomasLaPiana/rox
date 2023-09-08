@@ -1,7 +1,7 @@
 // Contains the Structs for the Syntax of the Rox file
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct RoxFile {
-    file_requirements: String,
+    rox_version: f64,
 }

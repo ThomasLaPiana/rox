@@ -3,6 +3,7 @@
 # Example usage in parallel: rox -p docker_build black
 
 supplemental_files: ["someotherfile.yml"]
+rox_version: 1.3
 
 version_requirements:
   - command: "docker --version"
