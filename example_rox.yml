@@ -19,7 +19,7 @@ version_requirements:
 file_requirements:
   - path: ".env"
 
-commands:
+targets: # Shout out to Make
 
   # rox docker_build -foo dev
   # rox docker_build -foo prod
@@ -28,8 +28,7 @@ commands:
     parameters:
       - symbol: foo # Rox will look for and replace $foo in both the command and arguments
         values: ["prod", "dev"]
-    command: "docker"
-    arguments: ["--target", "$foo", ".", "--quiet"]
+    command: "docker --target $foo . --quiet"
     
   - name: isort
     command: isort
