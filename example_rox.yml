@@ -21,21 +21,27 @@ file_requirements: # Verify that these files exist
 
 targets: # Shout out to Make
 
-  # rox docker_build -foo dev
+  # Run all parameters:
+  # rox cargo
+
+  # Run only the specified params, errors if no match
   # rox docker_build -foo prod
-  # rox docker_build
-  - name: docker_build
+  - name: cargo
     parameters:
       - symbol: foo # Rox will look for and replace $foo in both the command and arguments
-        values: ["prod", "dev"]
-    command: "docker --target $foo . --quiet"
+        values: ["fmt", "clippy", "test"]
+    command: "cargo $foo"
     
-  - name: isort
-    command: isort
+  - name: watch_me_run
+    command: "cargo watch -c -x run"
 
-  - name: black
-    command: black
-    arguments: ["src"]
+  - name: clippy_check
+    command: "cargo clippy -D warnings"
 
-  - name: format
-    depends_on: ["black, isort"] # This order is preserved, unless run with the `-p` flag
+  - name: test
+    command: "cargo test"
+
+  # Runs all dependencies first, as a way to group, etc.
+  # rox ci_suite
+  - name: ci_suite
+    depends_on: ["clippy_check, test"] # This order is preserved, unless run with the `-p` flag

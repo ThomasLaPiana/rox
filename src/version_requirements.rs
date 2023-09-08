@@ -20,7 +20,7 @@ pub fn check_version(requirements: VersionRequirements) {
     let mut version = std::str::from_utf8(&command_output.stdout).unwrap().trim();
 
     if requirements.split.is_some_and(|x| x) {
-        version = version.split(" ").last().unwrap();
+        version = version.split(' ').last().unwrap();
     }
     println!("> Found version: {}", version);
 
@@ -28,8 +28,7 @@ pub fn check_version(requirements: VersionRequirements) {
     let minver = requirements.minimum_version;
     let maxver = requirements.maximum_version;
 
-    if minver.is_some() {
-        let unwrapped_minver = minver.unwrap();
+    if let Some(unwrapped_minver) = minver {
         println!("> Minimum Version Required: {}", unwrapped_minver);
         let parsed_minver = VersionReq::from_str(&format!("> {}", &unwrapped_minver))
             .expect("Failed to parse minimum version!");
@@ -40,8 +39,7 @@ pub fn check_version(requirements: VersionRequirements) {
         }
     }
 
-    if maxver.is_some() {
-        let unwrapped_maxver = maxver.unwrap();
+    if let Some(unwrapped_maxver) = maxver {
         println!("> Maximum Version Expected: {}", unwrapped_maxver);
         let parsed_minver = VersionReq::from_str(&format!("< {}", &unwrapped_maxver))
             .expect("Failed to parse maximum version!");

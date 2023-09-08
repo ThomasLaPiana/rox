@@ -21,7 +21,7 @@ pub fn horizontal_rule() {
 }
 
 pub fn split_head_from_rest(snek: String) -> (String, Vec<String>) {
-    let mut split_snek = snek.split(" ");
+    let mut split_snek = snek.split(' ');
     let head: String = split_snek.next().unwrap().to_owned();
     let remainder: Vec<String> = split_snek.map(|x| x.to_owned()).collect();
     (head, remainder)
