@@ -17,7 +17,7 @@ version_requirements:
     minimum_version: "3.8"
 
 file_requirements: # Verify that these files exist
-  - ".env"
+  - "Cargo.toml"
 
 targets: # Shout out to Make
 

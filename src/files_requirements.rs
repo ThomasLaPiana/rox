@@ -1,6 +1,7 @@
 use crate::utils;
 
 pub fn check_file_exists(path: &str) {
+    println!("Checking for file at path: {}", path);
     let result = std::path::Path::new(path).exists();
 
     if !result {
@@ -13,6 +14,11 @@ pub fn check_file_exists(path: &str) {
             utils::ColorEnum::Red,
         );
         panic!()
+    } else {
+        utils::color_print(
+            vec!["File Check succeeded!".to_string()],
+            utils::ColorEnum::Green,
+        );
     }
 }
 

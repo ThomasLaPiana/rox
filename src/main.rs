@@ -30,9 +30,11 @@ fn main() -> anyhow::Result<()> {
 
     // Check Files
     if roxfile.file_requirements.is_some() {
+        println!("{}", "> Checking files...");
         for file in roxfile.file_requirements.unwrap().into_iter() {
             files_requirements::check_file_exists(&file);
         }
     }
+    utils::horizontal_rule();
     Ok(())
 }

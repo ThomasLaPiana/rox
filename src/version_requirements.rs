@@ -35,6 +35,7 @@ pub fn check_version(requirements: VersionRequirements) {
             .expect("Failed to parse minimum version!");
         let result = parsed_minver.matches(&parsed_version);
         if !result {
+            // TODO: Convert this panic to a RED print
             panic!("Minimum Version Mismatch!");
         }
     }
@@ -46,6 +47,7 @@ pub fn check_version(requirements: VersionRequirements) {
             .expect("Failed to parse maximum version!");
         let result = parsed_minver.matches(&parsed_version);
         if !result {
+            // TODO: Convert this panic to a RED print
             panic!("Maximum Version Mismatch!");
         }
     }
