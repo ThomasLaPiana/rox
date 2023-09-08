@@ -9,9 +9,18 @@ pub struct VersionRequirements {
     pub split: Option<bool>,
 }
 
+#[derive(Deserialize, Debug, Clone)]
+pub struct Target {
+    pub name: String,
+    pub command: String,
+    pub description: Option<String>,
+}
+
 #[derive(Deserialize, Debug)]
 pub struct RoxFile {
-    pub rox_version: f64,
     pub version_requirements: Option<Vec<VersionRequirements>>,
     pub file_requirements: Option<Vec<String>>,
+    pub always_check_requirements: Option<bool>,
+    pub targets: Option<Vec<Target>>,
+    pub additional_files: Option<Vec<String>>,
 }

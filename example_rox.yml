@@ -1,9 +1,10 @@
-# This is a target for eventual language support
-# Example usage: rox docker_build
-# Example usage in parallel: rox -p docker_build black
+# This is an ideal end-state for functionality
 
+# Other files can be combined, but watch out for overwriting identical target names!
 supplemental_files: ["someotherfile.yml"]
-rox_version: 1.3
+
+# In YAML, _any_ value is considered True for booleans
+# always_check_requirements: true 
 
 # These checks require a single, well-formed SemVer version string as output from the command
 # Eventually would like to be able to pin specific versions as well?
@@ -31,17 +32,21 @@ targets: # Shout out to Make
       - symbol: foo # Rox will look for and replace $foo in both the command and arguments
         values: ["fmt", "clippy", "test"]
     command: "cargo $foo"
+    description: "Run various cargo subcommands/tools"
     
   - name: watch_me_run
     command: "cargo watch -c -x run"
+    description: "Watch & run"
 
   - name: clippy_check
     command: "cargo clippy -D warnings"
 
   - name: test
     command: "cargo test"
+    description: "Run tests"
 
   # Runs all dependencies first, as a way to group, etc.
   # rox ci_suite
   - name: ci_suite
     depends_on: ["clippy_check, test"] # This order is preserved, unless run with the `-p` flag
+    command: pass
