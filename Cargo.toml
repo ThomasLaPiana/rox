@@ -8,6 +8,8 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
+clap = "4.4.2"
+colored = "2.0.4"
 semver = "1.0.18"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_yaml = "0.9.25"
