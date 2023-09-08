@@ -1,6 +1,7 @@
 mod files_requirements;
 mod parser;
 mod syntax;
+mod targets;
 mod utils;
 mod version_requirements;
 use clap::{Arg, ArgAction, Command};
@@ -68,6 +69,8 @@ fn main() {
             }
         }
     }
+
+    // Nothing above caught the execution, so we attempt to run a Target
 
     // Print out the elapsed time
     println!("Elapsed time: {}ms", start.elapsed().as_millis());

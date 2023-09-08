@@ -54,3 +54,18 @@ pub fn check_version(requirements: VersionRequirements) {
         utils::ColorEnum::Green,
     );
 }
+
+#[test]
+fn valid_versions() {
+    todo!()
+}
+
+#[test]
+fn under_min_version() {
+    todo!()
+}
+
+#[test]
+fn over_max_version() {
+    todo!()
+}
