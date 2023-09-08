@@ -6,13 +6,15 @@ supplemental_files: ["someotherfile.yml"]
 rox_version: 1.3
 
 # These checks require a single, well-formed SemVer version string as output from the command
+# Eventually would like to be able to pin specific versions as well?
 version_requirements:
-  - command: "docker version --format {{.Client.Version}}"
-    minimum_version: ["20.10.7"]
-    maximum_version: ["21.0.0"]
+  - command: "docker version --format {{.Client.Version}}" # 20.10.23
+    minimum_version: "20.10.7"
+    maximum_version: "21.0.0"
 
-  - command: "python --version"
-    versions: ["*"] # Any version will do, verifies the tool is available
+  - command: "python --version" # Python 3.9.13
+    split: true # splits on spaces and grabs the last output token
+    minimum_version: "3.8"
 
 file_requirements:
   - path: ".env"
