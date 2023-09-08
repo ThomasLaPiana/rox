@@ -30,7 +30,7 @@ pub fn check_version(requirements: VersionRequirements) {
 
     if minver.is_some() {
         let unwrapped_minver = minver.unwrap();
-        println!("> Minimum Version found: {}", unwrapped_minver);
+        println!("> Minimum Version Required: {}", unwrapped_minver);
         let parsed_minver = VersionReq::from_str(&format!("> {}", &unwrapped_minver))
             .expect("Failed to parse minimum version!");
         let result = parsed_minver.matches(&parsed_version);
@@ -41,7 +41,7 @@ pub fn check_version(requirements: VersionRequirements) {
 
     if maxver.is_some() {
         let unwrapped_maxver = maxver.unwrap();
-        println!("> Minimum Version found: {}", unwrapped_maxver);
+        println!("> Maximum Version Expected: {}", unwrapped_maxver);
         let parsed_minver = VersionReq::from_str(&format!("< {}", &unwrapped_maxver))
             .expect("Failed to parse maximum version!");
         let result = parsed_minver.matches(&parsed_version);
@@ -49,6 +49,8 @@ pub fn check_version(requirements: VersionRequirements) {
             panic!("Maximum Version Mismatch!");
         }
     }
-
-    println!("{:?}", parsed_version);
+    utils::color_print(
+        vec!["Version Check succeeded!".to_string()],
+        utils::ColorEnum::Green,
+    );
 }

@@ -16,8 +16,8 @@ version_requirements:
     split: true # splits on spaces and grabs the last output token
     minimum_version: "3.8"
 
-file_requirements:
-  - path: ".env"
+file_requirements: # Verify that these files exist
+  - ".env"
 
 targets: # Shout out to Make
 

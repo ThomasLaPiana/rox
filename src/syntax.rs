@@ -13,4 +13,5 @@ pub struct VersionRequirements {
 pub struct RoxFile {
     pub rox_version: f64,
     pub version_requirements: Option<Vec<VersionRequirements>>,
+    pub file_requirements: Option<Vec<String>>,
 }

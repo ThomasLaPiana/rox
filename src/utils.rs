@@ -2,7 +2,6 @@ use colored::Colorize;
 
 pub enum ColorEnum {
     Green,
-    Yellow,
     Red,
 }
 
@@ -14,8 +13,11 @@ pub fn color_print(outputs: Vec<String>, color: ColorEnum) {
     match color {
         ColorEnum::Green => println!("{}", concat_output.green()),
         ColorEnum::Red => println!("{}", concat_output.red()),
-        ColorEnum::Yellow => println!("{}", concat_output.yellow()),
     }
+}
+
+pub fn horizontal_rule() {
+    println!("-------------------------------------------");
 }
 
 pub fn split_head_from_rest(snek: String) -> (String, Vec<String>) {
