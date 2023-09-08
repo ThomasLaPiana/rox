@@ -1,12 +1,38 @@
-version_requirements:
-    - command: "docker --version"
-      version: "20.10.7"
+# This is a target for eventual language support
+# Example usage: rox docker_build
+# Example usage in parallel: rox -p docker_build black
 
-    - command: "python --version"
-      versions: ["3.8", "3.9", "3.10"]
+supplemental_files: ["someotherfile.yml"]
+
+version_requirements:
+  - command: "docker --version"
+    minimum_version: ["20.10.7"]
+    maximum_version: ["21.0.0"]
+
+  - command: "python --version"
+    versions: ["*"] # Any version will do, verifies the tool is available
+
+file_requirements:
+  - path: ".env"
 
 commands:
+
+  # rox docker_build -foo dev
+  # rox docker_build -foo prod
+  # rox docker_build
   - name: docker_build
+    parameters:
+      - symbol: foo # Rox will look for and replace $foo in both the command and arguments
+        values: ["prod", "dev"]
     command: "docker"
-    arguments: ["--target", "prod", "."]
+    arguments: ["--target", "$foo", ".", "--quiet"]
     
+  - name: isort
+    command: isort
+
+  - name: black
+    command: black
+    arguments: ["src"]
+
+  - name: format
+    depends_on: ["black, isort"] # This order is preserved, unless run with the `-p` flag
