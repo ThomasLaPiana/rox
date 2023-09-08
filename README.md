@@ -2,6 +2,8 @@
 
 Composable Dev Commands inspired by [Nox](https://nox.thea.codes/en/stable/)
 
+Put another way, the [carcinisation](https://en.wikipedia.org//wiki/Carcinisation) of Nox
+
 See `example_rox.yml` for an idea end-state of syntax and functionality!
 
 ## Features
