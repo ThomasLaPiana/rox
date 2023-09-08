@@ -7,6 +7,7 @@ use colored::Colorize;
 use utils::{color_print, ColorEnum};
 
 fn main() -> anyhow::Result<()> {
+    let start = std::time::Instant::now();
     println!("{}", "\t~~~~~~ Rox ~~~~~~".underline().bright_green());
     // Load in the Roxfile(s)
     let file_path = "example_rox.yml".to_string();
@@ -35,5 +36,8 @@ fn main() -> anyhow::Result<()> {
         }
     }
     utils::horizontal_rule();
+
+    // Print out the elapsed time
+    println!("Elapsed time: {}ms", start.elapsed().as_millis());
     Ok(())
 }
