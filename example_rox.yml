@@ -1,0 +1,12 @@
+version_requirements:
+    - command: "docker --version"
+      version: "20.10.7"
+
+    - command: "python --version"
+      versions: ["3.8", "3.9", "3.10"]
+
+commands:
+  - name: docker_build
+    command: "docker"
+    arguments: ["--target", "prod", "."]
+    
