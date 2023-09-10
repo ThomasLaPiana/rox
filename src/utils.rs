@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use colored::Colorize;
 
 pub enum ColorEnum {
@@ -5,7 +7,10 @@ pub enum ColorEnum {
     Red,
 }
 
-pub fn color_print(outputs: Vec<String>, color: ColorEnum) {
+pub fn color_print<T>(outputs: Vec<T>, color: ColorEnum)
+where
+    T: Display + Into<String>,
+{
     let concat_output = outputs
         .iter()
         .fold("".to_string(), |x, y| format!("{}{}", x, y));

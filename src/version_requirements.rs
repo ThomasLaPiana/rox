@@ -76,18 +76,15 @@ pub fn check_version(requirements: VersionRequirement) {
     let version_check_result = compare_versions(version, minver, maxver);
 
     match version_check_result {
-        VersionCheck::Valid => utils::color_print(
-            vec!["Version Check succeeded!".to_string()],
-            utils::ColorEnum::Green,
-        ),
-        VersionCheck::AboveMax => utils::color_print(
-            vec!["Exceeded maximum version!".to_string()],
-            utils::ColorEnum::Red,
-        ),
-        VersionCheck::BelowMin => utils::color_print(
-            vec!["Below minimum version!".to_string()],
-            utils::ColorEnum::Red,
-        ),
+        VersionCheck::Valid => {
+            utils::color_print(vec!["Version Check succeeded!"], utils::ColorEnum::Green)
+        }
+        VersionCheck::AboveMax => {
+            utils::color_print(vec!["Exceeded maximum version!"], utils::ColorEnum::Red)
+        }
+        VersionCheck::BelowMin => {
+            utils::color_print(vec!["Below minimum version!"], utils::ColorEnum::Red)
+        }
     }
 }
 
