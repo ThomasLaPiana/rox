@@ -35,10 +35,10 @@ pub fn handle_file_requirement(requirement: FileRequirement) {
 
 #[test]
 fn test_file_exists() {
-    assert_eq!(check_file_exists("Cargo.toml"), true);
+    assert!(check_file_exists("Cargo.toml"));
 }
 
 #[test]
 fn test_no_file_panics() {
-    assert_eq!(check_file_exists("not_a_file"), false);
+    assert!(!check_file_exists("not_a_file"));
 }

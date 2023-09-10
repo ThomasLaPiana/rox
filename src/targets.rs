@@ -2,7 +2,6 @@ use crate::syntax::Target;
 use crate::utils;
 use std::{
     process::{Command, Output},
-    str::FromStr,
 };
 
 pub fn run_target(target: &Target) {
