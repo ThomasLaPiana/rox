@@ -35,10 +35,19 @@ targets: # Shout out to Make
     description: "Run various cargo subcommands/tools"
     pre_targets: ["other_target"] # List of other targets to run before this one
     post_targets: ["other_other_target"] # List of other targets to run before this one
+
+  - name: db
+    description: "Build the application dockerfile"
+    command: "docker build . -t rox:local"
+
+  - name: dr
+    description: "Run 'help' for the packaged Docker application"
+    command: "docker run rox:local"
+    pre_targets: ["db"]
     
-  - name: watch_me_run
+  - name: wr
     command: "cargo watch -c -x run"
-    description: "Watch & run"
+    description: "Run the application, restarting on file changes"
 
   - name: clippy_ci
     command: "cargo clippy -D warnings"

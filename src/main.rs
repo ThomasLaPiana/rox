@@ -56,13 +56,13 @@ fn main() {
         utils::horizontal_rule();
     }
 
-    // Nab the target and pass it to the runner
+    // Nab the primary target and pass it to the executor
     let target_stuff = target_map
         .get(cli_matches.subcommand_name().unwrap())
         .unwrap();
-    targets::run_target(target_stuff);
+    targets::execute_targets(target_stuff.to_owned(), &target_map);
 
     // Print out the elapsed time
     utils::horizontal_rule();
-    println!("> Total elapsed time: {}ms", start.elapsed().as_millis());
+    println!("> Total elapsed time: {}s", start.elapsed().as_secs());
 }

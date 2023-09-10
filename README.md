@@ -10,10 +10,10 @@ See the [example_rox.yml](example_rox.yml) for an idea of the planned end-state 
 
 - [x] Enforce Version Requirements (by doing semver-style version comparison)
 - [x] Enforce that certain files exist (i.e. a `.env` file)
+- [x] Show elapsed time all commands
 - [ ] Command dependencies (pre/post targets)
-- [ ] First-Class support for Git Operations
+- [ ] Supports Parallelization
 - [ ] Parametrize Commands
 - [ ] Support passing inputs/outputs
-- [ ] Supports Parallelization
-- [ ] Show elapsed time all commands
 - [ ] Support definitions in multiple files
+- [ ] First-Class support for Git Operations

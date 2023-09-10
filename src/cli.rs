@@ -4,7 +4,7 @@ use clap::{Arg, ArgAction, Command};
 /// Construct the CLI
 pub fn cli_builder(subcommands: Vec<Command>) -> Command {
     Command::new("rox")
-        .about("Robust Developer Experience CLI")
+        .about("Rox: The Robust Developer Experience CLI")
         .arg_required_else_help(true)
         .arg(
             Arg::new("parallel")
