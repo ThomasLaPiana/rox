@@ -11,7 +11,7 @@ See the [example_rox.yml](example_rox.yml) for an idea of the planned end-state 
 - [x] Enforce Version Requirements (by doing semver-style version comparison)
 - [x] Enforce that certain files exist (i.e. a `.env` file)
 - [x] Show elapsed time all commands
-- [ ] Command dependencies (pre/post targets)
+- [x] Command dependencies (pre/post targets)
 - [ ] Supports Parallelization
 - [ ] Parametrize Commands
 - [ ] Support passing inputs/outputs

@@ -33,12 +33,11 @@ targets: # Shout out to Make
         values: ["fmt", "clippy", "test"]
     command: "cargo $foo"
     description: "Run various cargo subcommands/tools"
-    pre_targets: ["other_target"] # List of other targets to run before this one
-    post_targets: ["other_other_target"] # List of other targets to run before this one
 
   - name: db
     description: "Build the application dockerfile"
     command: "docker build . -t rox:local"
+    post_targets: ["dr"]
 
   - name: dr
     description: "Run 'help' for the packaged Docker application"
@@ -59,8 +58,6 @@ targets: # Shout out to Make
     command: "cargo test"
     description: "Run tests"
 
-  # Runs all dependencies first, as a way to group, etc.
-  # rox ci_suite
-  - name: ci_suite
-    depends_on: ["clippy_check, test"] # This order is preserved, unless run with the `-p` flag
-    command: pass
+  - name: pc
+    description: "All things to run before a commit"
+    pre_targets: ["clippy", "test"]

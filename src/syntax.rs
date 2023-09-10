@@ -18,8 +18,10 @@ pub struct FileRequirement {
 #[derive(Deserialize, Debug, Clone)]
 pub struct Target {
     pub name: String,
-    pub command: String,
+    pub command: Option<String>, // This is optional because it is valid if there are pre or post hooks
     pub description: Option<String>,
+    pub pre_targets: Option<Vec<String>>,
+    pub post_targets: Option<Vec<String>>,
 }
 
 /// The top-level structure of the Roxfile
