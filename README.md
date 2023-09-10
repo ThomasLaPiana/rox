@@ -16,4 +16,4 @@ See the [example_rox.yml](example_rox.yml) for an idea of the planned end-state 
 - [ ] Parametrize Commands
 - [ ] Support passing inputs/outputs
 - [ ] Support definitions in multiple files
-- [ ] First-Class support for Git Operations
+- [ ] First-Class support for Git Operations?

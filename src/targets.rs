@@ -21,17 +21,11 @@ pub fn run_target(target: &Target) -> i32 {
 pub fn execute_targets(primary_target: Target, target_map: &HashMap<String, Target>) {
     // TODO: Deduplicate target calls?
     // TODO: Check for circular dependencies
+    let current_command = primary_target.command.clone().unwrap_or_default();
     let pre_targets = primary_target.pre_targets.clone().unwrap_or_default();
     let post_targets = primary_target.post_targets.clone().unwrap_or_default();
 
-    if primary_target
-        .command
-        .clone()
-        .unwrap_or_default()
-        .is_empty()
-        && pre_targets.is_empty()
-        && post_targets.is_empty()
-    {
+    if current_command.is_empty() && pre_targets.is_empty() && post_targets.is_empty() {
         panic!("Targets must have either a command, pre_targets, post_targets, or any combination of the above.")
     }
 
@@ -51,16 +45,18 @@ pub fn execute_targets(primary_target: Target, target_map: &HashMap<String, Targ
     // Recursively run pre targets
     for target in pre_targets {
         let t = target_map.get(&target).unwrap().to_owned();
-        execute_targets(t, &target_map);
+        execute_targets(t, target_map);
     }
 
     // Run the primary target once all pre targets are exhausted
-    run_target(&primary_target);
+    if !current_command.is_empty() {
+        run_target(&primary_target);
+    }
 
     // Recursively run the post targets
     for target in post_targets {
         let t = target_map.get(&target).unwrap().to_owned();
-        execute_targets(t, &target_map);
+        execute_targets(t, target_map);
     }
 }
 

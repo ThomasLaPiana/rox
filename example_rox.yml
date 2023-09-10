@@ -3,11 +3,10 @@
 # Other files can be combined, but watch out for overwriting identical target names!
 supplemental_files: ["someotherfile.yml"]
 
-# In YAML, _any_ value is considered True for booleans
+# If this isn't true, requirments won't be checked before running the target(s)
 always_check_requirements: true 
 
 # These checks require a single, well-formed SemVer version string as output from the command
-# Eventually would like to be able to pin specific versions as well?
 version_requirements:
   - command: "docker version --format {{.Client.Version}}" # 20.10.23
     minimum_version: "20.10.7"
@@ -23,8 +22,11 @@ file_requirements: # Verify that these files exist
   - path: "example_rox.yml"
     create_if_not_exists: true # Create the file if it doesn't exist 
 
-targets: # Shout out to Make
+targets:
 
+  #------------------------------------------------
+  # This section is for unimplemented functionality
+  #------------------------------------------------
   # Run only the specified params, errors if no match
   # rox docker_build -foo prod
   - name: cargo
@@ -34,10 +36,12 @@ targets: # Shout out to Make
     command: "cargo $foo"
     description: "Run various cargo subcommands/tools"
 
+  #------------------------------------------------
+  # This section is for _already_ implemented functionality
+  #------------------------------------------------
   - name: db
     description: "Build the application dockerfile"
     command: "docker build . -t rox:local"
-    post_targets: ["dr"]
 
   - name: dr
     description: "Run 'help' for the packaged Docker application"
@@ -57,7 +61,13 @@ targets: # Shout out to Make
   - name: test
     command: "cargo test"
     description: "Run tests"
+    pre_targets: ["run"]
+    post_targets: ["clippy"]
+
+  - name: run
+    description: "Runs the 'help' command as a basic test"
+    command: "cargo run -h"
 
   - name: pc
     description: "All things to run before a commit"
-    pre_targets: ["clippy", "test"]
+    pre_targets: ["clippy", "test"] # It is valid to have no command if there are pre/post targets instead
