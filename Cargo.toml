@@ -1,10 +1,15 @@
 [package]
-name = "rox"
+name = "rox-cli"
 authors = ["Thomas La Piana"]
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/ThomasLaPiana/rox"
+license = "MIT OR Apache-2.0"
+categories = ["command-line-utilities", "development-tools"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "rox"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.75"

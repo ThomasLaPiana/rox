@@ -29,3 +29,4 @@ To play around further, you can either run `cargo run help` or execute the built
 - [ ] Support passing inputs/outputs
 - [ ] Support definitions in multiple files
 - [ ] First-Class support for Git Operations?
+- [ ] Inject env vars into the command templates
