@@ -18,7 +18,10 @@ version_requirements:
     minimum_version: "3.8"
 
 file_requirements: # Verify that these files exist
-  - "Cargo.toml"
+  - path: "Cargo.toml"
+    create_if_not_exists: true # Create the file if it doesn't exist 
+  
+  - path: ".fakefile"
 
 targets: # Shout out to Make
 
@@ -33,6 +36,8 @@ targets: # Shout out to Make
         values: ["fmt", "clippy", "test"]
     command: "cargo $foo"
     description: "Run various cargo subcommands/tools"
+    pre: ["other_target"] # List of other targets to run before this one
+    post: ["other_other_target"] # List of other targets to run before this one
     
   - name: watch_me_run
     command: "cargo watch -c -x run"

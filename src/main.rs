@@ -1,4 +1,4 @@
-mod files_requirements;
+mod file_requirements;
 mod parser;
 mod syntax;
 mod targets;
@@ -54,8 +54,8 @@ fn main() {
         // Check Files
         if roxfile.file_requirements.is_some() {
             println!("Checking files...");
-            for file in roxfile.file_requirements.unwrap().into_iter() {
-                files_requirements::check_file_exists(&file);
+            for requirement in roxfile.file_requirements.unwrap().into_iter() {
+                file_requirements::handle_file_requirement(requirement);
             }
         }
         utils::horizontal_rule();
@@ -63,9 +63,13 @@ fn main() {
 
     if cli_matches.subcommand_matches("show").is_some() {
         if let Some(targets) = roxfile.targets {
+            println!("> Listing Available Targets:");
             for target in targets {
-                println!("- Target Name: {}", target.name);
-                println!("  Description: {}", target.description.unwrap_or_default());
+                println!("  - Target Name: {}", target.name);
+                println!(
+                    "    Description: {}",
+                    target.description.unwrap_or_default()
+                );
             }
         }
     }
