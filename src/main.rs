@@ -4,28 +4,9 @@ mod syntax;
 mod targets;
 mod utils;
 mod version_requirements;
-use clap::{Arg, ArgAction, Command};
+use std::collections::HashMap;
 use utils::{color_print, ColorEnum};
-
-// TODO: Write a macro that parses the file ahead-of-time?
-
-fn cli_builder(additional_commands: Vec<Command>) -> Command {
-    Command::new("rox")
-        .about("Robust Developer Experience CLI")
-        .arg_required_else_help(true)
-        .arg(
-            Arg::new("parallel")
-                .long("parallel")
-                .short('p')
-                .required(false)
-                .action(ArgAction::SetTrue)
-                .help("Runs all checks and targets in parallel."),
-        )
-        .subcommand(
-            Command::new("requirements").about("[Default] Run only the file and version checks."),
-        )
-        .subcommands(additional_commands)
-}
+mod cli;
 
 fn main() {
     let start = std::time::Instant::now();
@@ -41,32 +22,19 @@ fn main() {
     utils::horizontal_rule();
 
     // Build the CLI
-    let additional_commands = roxfile
-        .targets
-        .clone()
-        .iter()
-        .map(|target| {
-            Command::new(&target.name).about(target.description.clone().unwrap_or_default())
-        })
-        .collect();
-    let cli = cli_builder(additional_commands);
+    let targets = roxfile.targets.clone();
+    let subcommands = cli::build_sub_commands(targets.clone());
+    let cli = cli::cli_builder(subcommands);
     let cli_matches = cli.get_matches();
 
     // Build a HashMap of the targets and their objects
-    let mut target_map = std::collections::HashMap::new();
-    for target in roxfile.targets {
-        target_map.insert(target.name.clone(), target);
-    }
+    let target_map: HashMap<String, syntax::Target> = std::collections::HashMap::from_iter(
+        targets
+            .into_iter()
+            .map(|target| (target.name.clone(), target)),
+    );
 
-    // Nab the target and pass it to the runner
-    let (_, target_stuff) = target_map
-        .get_key_value(cli_matches.subcommand_name().unwrap())
-        .unwrap();
-    targets::run_target(target_stuff);
-
-    if cli_matches.subcommand_matches("requirements").is_some()
-        || roxfile.always_check_requirements.is_some()
-    {
+    if roxfile.always_check_requirements.is_some() {
         // Check Versions
         if roxfile.version_requirements.is_some() {
             println!("> Checking versions...");
@@ -85,6 +53,12 @@ fn main() {
         }
         utils::horizontal_rule();
     }
+
+    // Nab the target and pass it to the runner
+    let target_stuff = target_map
+        .get(cli_matches.subcommand_name().unwrap())
+        .unwrap();
+    targets::run_target(target_stuff);
 
     // Print out the elapsed time
     println!("Elapsed time: {}ms", start.elapsed().as_millis());

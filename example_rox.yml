@@ -4,7 +4,7 @@
 supplemental_files: ["someotherfile.yml"]
 
 # In YAML, _any_ value is considered True for booleans
-# always_check_requirements: true 
+always_check_requirements: true 
 
 # These checks require a single, well-formed SemVer version string as output from the command
 # Eventually would like to be able to pin specific versions as well?
@@ -24,9 +24,6 @@ file_requirements: # Verify that these files exist
     create_if_not_exists: true # Create the file if it doesn't exist 
 
 targets: # Shout out to Make
-
-  # Run all parameters:
-  # rox cargo
 
   # Run only the specified params, errors if no match
   # rox docker_build -foo prod
