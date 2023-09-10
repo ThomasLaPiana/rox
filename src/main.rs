@@ -22,7 +22,9 @@ fn main() {
     utils::horizontal_rule();
 
     // Build the CLI
-    let targets = roxfile.targets.clone();
+    let mut unsorted_targets = roxfile.targets.clone();
+    unsorted_targets.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
+    let targets = unsorted_targets;
     let subcommands = cli::build_sub_commands(targets.clone());
     let cli = cli::cli_builder(subcommands);
     let cli_matches = cli.get_matches();
@@ -61,5 +63,6 @@ fn main() {
     targets::run_target(target_stuff);
 
     // Print out the elapsed time
-    println!("Elapsed time: {}ms", start.elapsed().as_millis());
+    utils::horizontal_rule();
+    println!("> Total elapsed time: {}ms", start.elapsed().as_millis());
 }
