@@ -1,6 +1,7 @@
 [package]
 name = "rox-cli"
 authors = ["Thomas La Piana"]
+description = "A YAML-Defined CLI for Dev Tools"
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/ThomasLaPiana/rox"
