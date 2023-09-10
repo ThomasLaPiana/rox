@@ -43,8 +43,11 @@ targets: # Shout out to Make
     command: "cargo watch -c -x run"
     description: "Watch & run"
 
-  - name: clippy_check
+  - name: clippy_ci
     command: "cargo clippy -D warnings"
+
+  - name: clippy
+    command: "cargo clippy"
 
   - name: test
     command: "cargo test"

@@ -52,6 +52,18 @@ fn main() {
     let cli = cli_builder(additional_commands);
     let cli_matches = cli.get_matches();
 
+    // Build a HashMap of the targets and their objects
+    let mut target_map = std::collections::HashMap::new();
+    for target in roxfile.targets {
+        target_map.insert(target.name.clone(), target);
+    }
+
+    // Nab the target and pass it to the runner
+    let (_, target_stuff) = target_map
+        .get_key_value(cli_matches.subcommand_name().unwrap())
+        .unwrap();
+    targets::run_target(target_stuff);
+
     if cli_matches.subcommand_matches("requirements").is_some()
         || roxfile.always_check_requirements.is_some()
     {
