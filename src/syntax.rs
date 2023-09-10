@@ -1,4 +1,5 @@
-// Contains the Structs for the Syntax of the Rox file
+/// Contains the Structs for the Syntax of the Rox file
+/// Maps 1:1 with the structure of the YAML
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, Clone)]

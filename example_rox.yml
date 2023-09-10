@@ -13,7 +13,9 @@ version_requirements:
     maximum_version: "21.0.0"
 
   - command: "python --version" # Python 3.9.13
-    split: true # splits on spaces and grabs the last output token
+    # Splits on spaces and grabs the last output token,
+    # useful for avoiding bash manipulation of output
+    split: true 
     minimum_version: "3.8"
 
 file_requirements: # Verify that these files exist
