@@ -22,11 +22,12 @@ pub struct Target {
     pub description: Option<String>,
 }
 
+/// The top-level structure of the Roxfile
 #[derive(Deserialize, Debug)]
 pub struct RoxFile {
     pub version_requirements: Option<Vec<VersionRequirement>>,
     pub file_requirements: Option<Vec<FileRequirement>>,
     pub always_check_requirements: Option<bool>,
-    pub targets: Option<Vec<Target>>,
+    pub targets: Vec<Target>,
     pub additional_files: Option<Vec<String>>,
 }

@@ -1,3 +1,3 @@
-pub fn run_target() {
+pub fn run_targets() {
     todo!()
 }
