@@ -2,7 +2,7 @@
 name = "rox-cli"
 authors = ["Thomas La Piana"]
 description = "A YAML-Defined CLI for Dev Tools"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 repository = "https://github.com/ThomasLaPiana/rox"
 license = "MIT OR Apache-2.0"
