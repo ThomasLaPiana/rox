@@ -19,9 +19,9 @@ version_requirements:
 
 file_requirements: # Verify that these files exist
   - path: "Cargo.toml"
-    create_if_not_exists: true # Create the file if it doesn't exist 
   
-  - path: ".fakefile"
+  - path: "example_rox.yml"
+    create_if_not_exists: true # Create the file if it doesn't exist 
 
 targets: # Shout out to Make
 

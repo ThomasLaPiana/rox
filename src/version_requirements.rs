@@ -81,11 +81,11 @@ pub fn check_version(requirements: VersionRequirement) {
             utils::ColorEnum::Green,
         ),
         VersionCheck::AboveMax => utils::color_print(
-            vec!["Version Check succeeded!".to_string()],
+            vec!["Exceeded maximum version!".to_string()],
             utils::ColorEnum::Red,
         ),
         VersionCheck::BelowMin => utils::color_print(
-            vec!["Version Check succeeded!".to_string()],
+            vec!["Below minimum version!".to_string()],
             utils::ColorEnum::Red,
         ),
     }

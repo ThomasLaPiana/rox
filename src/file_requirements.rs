@@ -1,8 +1,9 @@
 use crate::syntax::FileRequirement;
 use crate::utils;
+use std::fs::File;
 
 pub fn check_file_exists(path: &str) -> bool {
-    println!("Checking for file at path: {}", path);
+    println!("> Checking for file at path: {}", path);
     std::path::Path::new(path).exists()
 }
 
@@ -10,7 +11,11 @@ pub fn handle_file_requirement(requirement: FileRequirement) {
     let result = check_file_exists(&requirement.path);
 
     if !result && requirement.create_if_not_exists.is_some() {
-        println!("> Creating file: {}", &requirement.path);
+        File::create(&requirement.path).expect("Failed to create file!");
+        utils::color_print(
+            vec!["Created file: ".to_string(), requirement.path.to_owned()],
+            utils::ColorEnum::Green,
+        );
     } else if !result {
         utils::color_print(
             vec![
