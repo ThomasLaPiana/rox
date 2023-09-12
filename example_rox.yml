@@ -1,6 +1,7 @@
 # This is an ideal end-state for functionality
 
 # Other files can be combined, but watch out for overwriting identical target names!
+# Not yet implemented
 supplemental_files: ["someotherfile.yml"]
 
 # If this isn't true, requirments won't be checked before running the target(s)
@@ -37,6 +38,7 @@ targets:
         values: ["fmt", "clippy", "test"]
     command: "cargo $foo"
     description: "Run various cargo subcommands/tools"
+    workdir: "/src" # Specify a workdir for the command, which makes it easier to use with Monorepos
 
   #------------------------------------------------
   # This section is for _already_ implemented functionality

@@ -28,9 +28,8 @@ To play around further, you can either run `cargo run help` or execute the built
 - [x] Show elapsed time all commands
 - [x] Command dependencies (pre/post targets)
 - [ ] Parametrize Commands
-- [ ] Publish cross-platform versions
-- [ ] Supports Parallelization
-- [ ] Support passing inputs/outputs
-- [ ] Support definitions in multiple files
+- [ ] Cross-Platform
+- [ ] Supports Parallelization of Target Execution
+- [ ] Support Passing Inputs/Outputs
+- [ ] Support Definitions in Multiple Files
 - [ ] First-Class support for Git Operations?
-- [ ] Inject env vars into the command templates

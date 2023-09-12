@@ -58,6 +58,7 @@ pub fn execute_targets(primary_target: Target, target_map: &HashMap<String, Targ
         let t = target_map.get(&target).unwrap().to_owned();
         execute_targets(t, target_map);
     }
+    // TODO: Add a nice table showing name/status/elapsed time
 }
 
 #[test]

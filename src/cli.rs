@@ -6,6 +6,8 @@ pub fn cli_builder(subcommands: Vec<Command>) -> Command {
     Command::new("rox")
         .about("Rox: The Robust Developer Experience CLI")
         .arg_required_else_help(true)
+        // TODO: Add a flag to ignore pre/post targets
+        // TODO: Add a "watch" flag to run the command on file changes to a path
         .arg(
             Arg::new("parallel")
                 .long("parallel")
