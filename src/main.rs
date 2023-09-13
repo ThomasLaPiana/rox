@@ -12,7 +12,7 @@ fn main() {
     let start = std::time::Instant::now();
 
     // Load in the Roxfile(s)
-    let file_path = "example_rox.yml".to_string();
+    let file_path = "roxfile.yml".to_string();
     println!("> Loading Roxfile from path: {}", file_path);
     let roxfile = parser::parse_file_contents(parser::load_file(file_path));
     color_print(

@@ -3,7 +3,7 @@
 ![crates.io](https://img.shields.io/crates/v/rox-cli.svg)
 [![CI Checks](https://github.com/ThomasLaPiana/rox/actions/workflows/checks.yml/badge.svg)](https://github.com/ThomasLaPiana/rox/actions/workflows/checks.yml)
 
-Composable Dev Commands inspired by [Nox](https://nox.thea.codes/en/stable/) and Make
+Composable Dev Commands inspired by [Nox](https://nox.thea.codes/en/stable/), Make & [cargo-make](https://github.com/sagiegurari/cargo-make)
 
 Rox gives you the ability to build your own CLI using YAML files, dynamically adding them to the `rox` command list. It's built with Rust, giving you fast startup times and cross-platform compabitility. Being both performant and flexible makes it easier for dev teams to standardize their workflows without writing endless "glue" scripts.
 
@@ -11,7 +11,7 @@ The subcommands and their help messages are automatically populated at runtime f
 
 ![Rox Help](assets/help_screenshot.png "Help Screenshot")
 
-See the [example_rox.yml](example_rox.yml) for an idea of the planned end-state of syntax and functionality!
+See the [roxfile.yml](roxfile.yml) for an idea of the planned end-state of syntax and functionality! This is also the Roxfile used for this repo.
 
 ## Getting Started
 
