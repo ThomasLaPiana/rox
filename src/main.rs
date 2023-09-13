@@ -23,7 +23,13 @@ fn main() {
     utils::horizontal_rule();
 
     // Build the CLI
-    let mut unsorted_targets = roxfile.targets.clone();
+    let mut unsorted_targets: Vec<syntax::Target> = roxfile
+        .targets
+        .clone()
+        .iter()
+        .map(|target| syntax::target_builder(target.to_owned(), "roxfile.yml".to_string()))
+        .collect();
+
     unsorted_targets.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
     let targets = unsorted_targets;
     let subcommands = cli::build_sub_commands(targets.clone());
@@ -64,7 +70,5 @@ fn main() {
     let results = targets::execute_targets(target_stuff.to_owned(), &target_map);
     display::display_execution_results(results);
 
-    // Print out the elapsed time
-    utils::horizontal_rule();
     println!("> Total elapsed time: {}s", start.elapsed().as_secs());
 }

@@ -22,7 +22,7 @@ version_requirements:
 file_requirements: # Verify that these files exist
   - path: "Cargo.toml"
   
-  - path: "example_rox.yml"
+  - path: ".env"
     create_if_not_exists: true # Create the file if it doesn't exist 
 
 targets:
@@ -79,5 +79,4 @@ targets:
 
   - name: precommit
     description: "All things to run before a commit"
-    command: "notreal"
     pre_targets: ["clippy_ci", "test"] # It is valid to have no command if there are pre/post targets instead

@@ -2,6 +2,17 @@
 /// Maps 1:1 with the structure of the YAML
 use serde::Deserialize;
 
+/// This function builds each target and injects related metadata
+pub fn target_builder(target: Target, file_path: String) -> Target {
+    Target {
+        name: target.name,
+        command: target.command,
+        description: target.description,
+        pre_targets: target.pre_targets,
+        post_targets: target.post_targets,
+        file_path: Some(file_path),
+    }
+}
 #[derive(Deserialize, Debug, Clone)]
 pub struct VersionRequirement {
     pub command: String,
@@ -23,6 +34,7 @@ pub struct Target {
     pub description: Option<String>,
     pub pre_targets: Option<Vec<String>>,
     pub post_targets: Option<Vec<String>>,
+    pub file_path: Option<String>,
 }
 
 /// The top-level structure of the Roxfile

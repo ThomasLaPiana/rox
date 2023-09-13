@@ -8,7 +8,8 @@ pub fn display_execution_results(results: Vec<TargetResult>) {
         table.push(vec![
             result.name.cell(),
             result.result.cell().justify(Justify::Center),
-            result.elapsed_time.cell().justify(Justify::Right),
+            result.elapsed_time.cell().justify(Justify::Center),
+            result.file_path.cell().justify(Justify::Right),
         ])
     }
 
@@ -18,7 +19,8 @@ pub fn display_execution_results(results: Vec<TargetResult>) {
             .title(vec![
                 "Name".cell().bold(true),
                 "Exit Code".cell().bold(true),
-                "Elapsed Time (in secs)".cell().bold(true)
+                "Elapsed Time (in secs)".cell().bold(true),
+                "File Path".cell().bold(true),
             ])
             .bold(true),
     )

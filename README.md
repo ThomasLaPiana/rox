@@ -27,9 +27,9 @@ To play around further, you can either run `cargo run help` or execute the built
 - [x] Enforce that certain files exist (i.e. a `.env` file)
 - [x] Show elapsed time all commands
 - [x] Command dependencies (pre/post targets)
+- [ ] Supports Parallelization of Target Execution
 - [ ] Parametrize Commands
 - [ ] Cross-Platform
-- [ ] Supports Parallelization of Target Execution
 - [ ] Support Passing Inputs/Outputs
 - [ ] Support Definitions in Multiple Files
 - [ ] First-Class support for Git Operations?

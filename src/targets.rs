@@ -19,6 +19,7 @@ pub struct TargetResult {
     pub name: String,
     pub result: PassFail,
     pub elapsed_time: u64,
+    pub file_path: String,
 }
 
 pub fn run_target(target: &Target) -> TargetResult {
@@ -32,8 +33,9 @@ pub fn run_target(target: &Target) -> TargetResult {
     };
     TargetResult {
         name: target.name.to_string(),
-        result: result,
+        result,
         elapsed_time: start.elapsed().as_secs(),
+        file_path: target.file_path.clone().unwrap(),
     }
 }
 
@@ -92,6 +94,7 @@ fn test_invalid_command() {
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: None,
+        file_path: Some("test".to_string()),
     };
     let exit = run_target(&test_target);
     assert_eq!(
@@ -100,6 +103,7 @@ fn test_invalid_command() {
             name: "foo".to_string(),
             result: PassFail::Fail,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         }
     );
 }
@@ -113,6 +117,7 @@ fn test_no_command_no_pre_no_post() {
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: None,
+        file_path: Some("test".to_string()),
     };
     run_target(&test_target);
 }
@@ -125,6 +130,7 @@ fn test_valid_command() {
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: None,
+        file_path: Some("test".to_string()),
     };
     let exit = run_target(&test_target);
     assert_eq!(
@@ -133,6 +139,7 @@ fn test_valid_command() {
             name: "foo".to_string(),
             result: PassFail::Pass,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         }
     );
 }
@@ -145,6 +152,7 @@ fn test_execution_order() {
         description: Some("description".to_string()),
         pre_targets: Some(vec!["target2".to_string()]),
         post_targets: Some(vec!["target3".to_string()]),
+        file_path: Some("test".to_string()),
     };
     let target2 = Target {
         name: "target2".to_string(),
@@ -152,6 +160,7 @@ fn test_execution_order() {
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: Some(vec!["target3".to_string()]),
+        file_path: Some("test".to_string()),
     };
     let target3 = Target {
         name: "target3".to_string(),
@@ -159,6 +168,7 @@ fn test_execution_order() {
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: Some(vec!["target4".to_string()]),
+        file_path: Some("test".to_string()),
     };
     // Even though Target4 is listed as a post-target for target3,
     // it shouldn't get run!
@@ -168,6 +178,7 @@ fn test_execution_order() {
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: None,
+        file_path: Some("test".to_string()),
     };
     let mut test_target_map = HashMap::new();
     test_target_map.insert("target1".to_string(), target1.clone());
@@ -180,16 +191,19 @@ fn test_execution_order() {
             name: "target2".to_string(),
             result: PassFail::Pass,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         },
         TargetResult {
             name: "target1".to_string(),
             result: PassFail::Pass,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         },
         TargetResult {
             name: "target3".to_string(),
             result: PassFail::Pass,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         },
     ];
     assert_eq!(expected_output, output);
@@ -203,6 +217,7 @@ fn test_duplicate_command_execution() {
         description: Some("description".to_string()),
         pre_targets: Some(vec!["target2".to_string(), "target3".to_string()]),
         post_targets: Some(vec!["target3".to_string()]),
+        file_path: Some("test".to_string()),
     };
     let target2 = Target {
         name: "target2".to_string(),
@@ -210,6 +225,7 @@ fn test_duplicate_command_execution() {
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: Some(vec!["target3".to_string()]),
+        file_path: Some("test".to_string()),
     };
     let target3 = Target {
         name: "target3".to_string(),
@@ -217,6 +233,7 @@ fn test_duplicate_command_execution() {
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: Some(vec!["target4".to_string()]),
+        file_path: Some("test".to_string()),
     };
     let mut test_target_map = HashMap::new();
     test_target_map.insert("target1".to_string(), target1.clone());
@@ -228,21 +245,25 @@ fn test_duplicate_command_execution() {
             name: "target2".to_string(),
             result: PassFail::Pass,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         },
         TargetResult {
             name: "target3".to_string(),
             result: PassFail::Pass,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         },
         TargetResult {
             name: "target1".to_string(),
             result: PassFail::Pass,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         },
         TargetResult {
             name: "target3".to_string(),
             result: PassFail::Pass,
             elapsed_time: 0,
+            file_path: "test".to_string(),
         },
     ];
     assert_eq!(expected_output, output);
