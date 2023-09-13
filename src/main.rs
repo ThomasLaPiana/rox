@@ -7,6 +7,7 @@ mod version_requirements;
 use std::collections::HashMap;
 use utils::{color_print, ColorEnum};
 mod cli;
+mod display;
 
 fn main() {
     let start = std::time::Instant::now();
@@ -60,7 +61,8 @@ fn main() {
     let target_stuff = target_map
         .get(cli_matches.subcommand_name().unwrap())
         .unwrap();
-    targets::execute_targets(target_stuff.to_owned(), &target_map);
+    let results = targets::execute_targets(target_stuff.to_owned(), &target_map);
+    display::display_execution_results(results);
 
     // Print out the elapsed time
     utils::horizontal_rule();

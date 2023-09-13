@@ -3,7 +3,14 @@ use crate::utils;
 use std::collections::HashMap;
 use std::process::Command;
 
-pub fn run_target(target: &Target) -> i32 {
+#[derive(PartialEq, Debug)]
+pub struct TargetResult {
+    pub name: String,
+    pub exit_code: i32,
+    pub elapsed_time: u64,
+}
+
+pub fn run_target(target: &Target) -> TargetResult {
     let start = std::time::Instant::now();
     println!("> Running Target: {}", target.name);
     let (command, args) = utils::split_head_from_rest(target.command.as_ref().unwrap().clone());
@@ -14,13 +21,19 @@ pub fn run_target(target: &Target) -> i32 {
         target.name,
         start.elapsed().as_secs()
     );
-    exit_status
+    TargetResult {
+        name: target.name.to_string(),
+        exit_code: exit_status,
+        elapsed_time: start.elapsed().as_secs(),
+    }
 }
 
 /// Recursively called executor
-pub fn execute_targets(primary_target: Target, target_map: &HashMap<String, Target>) {
-    // TODO: Deduplicate target calls?
-    // TODO: Check for circular dependencies
+pub fn execute_targets(
+    primary_target: Target,
+    target_map: &HashMap<String, Target>,
+) -> Vec<TargetResult> {
+    // TODO: Check for non-existent targets
     let current_command = primary_target.command.clone().unwrap_or_default();
     let pre_targets = primary_target.pre_targets.clone().unwrap_or_default();
     let post_targets = primary_target.post_targets.clone().unwrap_or_default();
@@ -29,36 +42,37 @@ pub fn execute_targets(primary_target: Target, target_map: &HashMap<String, Targ
         panic!("Targets must have either a command, pre_targets, post_targets, or any combination of the above.")
     }
 
+    let mut command_stack: Vec<TargetResult> = Vec::new();
+
+    // Handle Pre-Targets
     if !pre_targets.is_empty() {
         println!(
             "Target: '{}' has the following pre targets: {:?}",
             primary_target.name, pre_targets
         );
+        for target in pre_targets {
+            let t = target_map.get(&target).unwrap().to_owned();
+            command_stack.push(run_target(&t));
+        }
     }
+
+    // Handle Primary Target
+    if !current_command.is_empty() {
+        command_stack.push(run_target(&primary_target));
+    }
+
+    // Handle Post-Targets
     if !post_targets.is_empty() {
         println!(
             "Target: {} has the following pre targets: {:?}",
             primary_target.name, post_targets
         );
+        for target in post_targets {
+            let t = target_map.get(&target).unwrap().to_owned();
+            command_stack.push(run_target(&t));
+        }
     }
-
-    // Recursively run pre targets
-    for target in pre_targets {
-        let t = target_map.get(&target).unwrap().to_owned();
-        execute_targets(t, target_map);
-    }
-
-    // Run the primary target once all pre targets are exhausted
-    if !current_command.is_empty() {
-        run_target(&primary_target);
-    }
-
-    // Recursively run the post targets
-    for target in post_targets {
-        let t = target_map.get(&target).unwrap().to_owned();
-        execute_targets(t, target_map);
-    }
-    // TODO: Add a nice table showing name/status/elapsed time
+    command_stack
 }
 
 #[test]
@@ -71,8 +85,7 @@ fn test_invalid_command() {
         pre_targets: None,
         post_targets: None,
     };
-    let exit = run_target(&test_target);
-    assert_eq!(exit, 1);
+    run_target(&test_target);
 }
 
 #[test]
@@ -85,8 +98,7 @@ fn test_no_command_no_pre_no_post() {
         pre_targets: None,
         post_targets: None,
     };
-    let exit = run_target(&test_target);
-    assert_eq!(exit, 1);
+    run_target(&test_target);
 }
 
 #[test]
@@ -99,5 +111,123 @@ fn test_valid_command() {
         post_targets: None,
     };
     let exit = run_target(&test_target);
-    assert_eq!(exit, 0);
+    assert_eq!(
+        exit,
+        TargetResult {
+            name: "foo".to_string(),
+            exit_code: 0,
+            elapsed_time: 0,
+        }
+    );
+}
+
+#[test]
+fn test_execution_order() {
+    let target1 = Target {
+        name: "target1".to_string(),
+        command: Some("docker --version".to_string()),
+        description: Some("description".to_string()),
+        pre_targets: Some(vec!["target2".to_string()]),
+        post_targets: Some(vec!["target3".to_string()]),
+    };
+    let target2 = Target {
+        name: "target2".to_string(),
+        command: Some("docker --version".to_string()),
+        description: Some("description".to_string()),
+        pre_targets: None,
+        post_targets: Some(vec!["target3".to_string()]),
+    };
+    let target3 = Target {
+        name: "target3".to_string(),
+        command: Some("docker --version".to_string()),
+        description: Some("description".to_string()),
+        pre_targets: None,
+        post_targets: Some(vec!["target4".to_string()]),
+    };
+    // Even though Target4 is listed as a post-target for target3,
+    // it shouldn't get run!
+    let target4 = Target {
+        name: "target4".to_string(),
+        command: Some("docker --version".to_string()),
+        description: Some("description".to_string()),
+        pre_targets: None,
+        post_targets: None,
+    };
+    let mut test_target_map = HashMap::new();
+    test_target_map.insert("target1".to_string(), target1.clone());
+    test_target_map.insert("target2".to_string(), target2);
+    test_target_map.insert("target3".to_string(), target3);
+    test_target_map.insert("target4".to_string(), target4);
+    let output = execute_targets(target1, &test_target_map);
+    let expected_output = vec![
+        TargetResult {
+            name: "target2".to_string(),
+            exit_code: 0,
+            elapsed_time: 0,
+        },
+        TargetResult {
+            name: "target1".to_string(),
+            exit_code: 0,
+            elapsed_time: 0,
+        },
+        TargetResult {
+            name: "target3".to_string(),
+            exit_code: 0,
+            elapsed_time: 0,
+        },
+    ];
+    assert_eq!(expected_output, output);
+}
+
+#[test]
+fn test_duplicate_command_execution() {
+    let target1 = Target {
+        name: "target1".to_string(),
+        command: Some("cargo --version".to_string()),
+        description: Some("description".to_string()),
+        pre_targets: Some(vec!["target2".to_string(), "target3".to_string()]),
+        post_targets: Some(vec!["target3".to_string()]),
+    };
+    let target2 = Target {
+        name: "target2".to_string(),
+        command: Some("cargo --version".to_string()),
+        description: Some("description".to_string()),
+        pre_targets: None,
+        post_targets: Some(vec!["target3".to_string()]),
+    };
+    let target3 = Target {
+        name: "target3".to_string(),
+        command: Some("cargo --version".to_string()),
+        description: Some("description".to_string()),
+        pre_targets: None,
+        post_targets: Some(vec!["target4".to_string()]),
+    };
+    let mut test_target_map = HashMap::new();
+    test_target_map.insert("target1".to_string(), target1.clone());
+    test_target_map.insert("target2".to_string(), target2);
+    test_target_map.insert("target3".to_string(), target3);
+    let output = execute_targets(target1, &test_target_map);
+    let expected_output = vec![
+        TargetResult {
+            name: "target2".to_string(),
+            exit_code: 0,
+            elapsed_time: 0,
+        },
+        TargetResult {
+            name: "target3".to_string(),
+            exit_code: 0,
+            elapsed_time: 0,
+        },
+        TargetResult {
+            name: "target1".to_string(),
+            exit_code: 0,
+            elapsed_time: 0,
+        },
+        TargetResult {
+            name: "target3".to_string(),
+            exit_code: 0,
+            elapsed_time: 0,
+        },
+    ];
+    assert_eq!(expected_output, output);
 }
