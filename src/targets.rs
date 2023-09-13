@@ -1,7 +1,7 @@
 use crate::syntax::Target;
 use crate::utils;
 use std::collections::HashMap;
-use std::process::Command;
+use std::process::{Command, ExitStatus};
 
 #[derive(PartialEq, Debug)]
 pub enum PassFail {
@@ -22,18 +22,28 @@ pub struct TargetResult {
     pub file_path: String,
 }
 
+pub fn get_result_passfail(result: Result<ExitStatus, std::io::Error>) -> PassFail {
+    // If the command doesn't exist, we get an error here
+    if result.is_err() {
+        return PassFail::Fail;
+    }
+
+    if result.unwrap().code().unwrap() == 0 {
+        return PassFail::Pass;
+    }
+
+    PassFail::Fail
+}
+
 pub fn run_target(target: &Target) -> TargetResult {
     let start = std::time::Instant::now();
     println!("> Running Target: {}", target.name);
     let (command, args) = utils::split_head_from_rest(target.command.as_ref().unwrap().clone());
     let command_results = Command::new(command).args(args).status();
-    let result = match command_results {
-        Ok(_) => PassFail::Pass,
-        _ => PassFail::Fail,
-    };
+
     TargetResult {
         name: target.name.to_string(),
-        result,
+        result: get_result_passfail(command_results),
         elapsed_time: start.elapsed().as_secs(),
         file_path: target.file_path.clone().unwrap(),
     }

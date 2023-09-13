@@ -38,6 +38,7 @@ fn compare_versions(
 
     // Check Min Version Constraints
     if let Some(unwrapped_minver) = minver {
+        let jej = "foo";
         println!("> Minimum Version Required: {}", unwrapped_minver);
         let parsed_minver = VersionReq::from_str(&format!("> {}", &unwrapped_minver))
             .expect("Failed to parse minimum version!");
