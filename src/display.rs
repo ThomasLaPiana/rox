@@ -7,7 +7,7 @@ pub fn display_execution_results(results: Vec<TargetResult>) {
     for result in results {
         table.push(vec![
             result.name.cell(),
-            result.exit_code.cell().justify(Justify::Center),
+            result.result.cell().justify(Justify::Center),
             result.elapsed_time.cell().justify(Justify::Right),
         ])
     }

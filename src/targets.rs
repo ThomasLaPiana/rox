@@ -4,9 +4,20 @@ use std::collections::HashMap;
 use std::process::Command;
 
 #[derive(PartialEq, Debug)]
+pub enum PassFail {
+    Pass,
+    Fail,
+}
+impl std::fmt::Display for PassFail {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+#[derive(PartialEq, Debug)]
 pub struct TargetResult {
     pub name: String,
-    pub exit_code: i32,
+    pub result: PassFail,
     pub elapsed_time: u64,
 }
 
@@ -15,15 +26,13 @@ pub fn run_target(target: &Target) -> TargetResult {
     println!("> Running Target: {}", target.name);
     let (command, args) = utils::split_head_from_rest(target.command.as_ref().unwrap().clone());
     let command_results = Command::new(command).args(args).status();
-    let exit_status = command_results.unwrap().code().unwrap();
-    println!(
-        "> Target '{}' elapsed time: {}s",
-        target.name,
-        start.elapsed().as_secs()
-    );
+    let result = match command_results {
+        Ok(_) => PassFail::Pass,
+        _ => PassFail::Fail,
+    };
     TargetResult {
         name: target.name.to_string(),
-        exit_code: exit_status,
+        result: result,
         elapsed_time: start.elapsed().as_secs(),
     }
 }
@@ -76,16 +85,23 @@ pub fn execute_targets(
 }
 
 #[test]
-#[should_panic]
 fn test_invalid_command() {
     let test_target = Target {
         name: "foo".to_string(),
-        command: Some("notacommand lol".to_string()),
+        command: Some("foo".to_string()),
         description: Some("description".to_string()),
         pre_targets: None,
         post_targets: None,
     };
-    run_target(&test_target);
+    let exit = run_target(&test_target);
+    assert_eq!(
+        exit,
+        TargetResult {
+            name: "foo".to_string(),
+            result: PassFail::Fail,
+            elapsed_time: 0,
+        }
+    );
 }
 
 #[test]
@@ -115,7 +131,7 @@ fn test_valid_command() {
         exit,
         TargetResult {
             name: "foo".to_string(),
-            exit_code: 0,
+            result: PassFail::Pass,
             elapsed_time: 0,
         }
     );
@@ -162,17 +178,17 @@ fn test_execution_order() {
     let expected_output = vec![
         TargetResult {
             name: "target2".to_string(),
-            exit_code: 0,
+            result: PassFail::Pass,
             elapsed_time: 0,
         },
         TargetResult {
             name: "target1".to_string(),
-            exit_code: 0,
+            result: PassFail::Pass,
             elapsed_time: 0,
         },
         TargetResult {
             name: "target3".to_string(),
-            exit_code: 0,
+            result: PassFail::Pass,
             elapsed_time: 0,
         },
     ];
@@ -210,22 +226,22 @@ fn test_duplicate_command_execution() {
     let expected_output = vec![
         TargetResult {
             name: "target2".to_string(),
-            exit_code: 0,
+            result: PassFail::Pass,
             elapsed_time: 0,
         },
         TargetResult {
             name: "target3".to_string(),
-            exit_code: 0,
+            result: PassFail::Pass,
             elapsed_time: 0,
         },
         TargetResult {
             name: "target1".to_string(),
-            exit_code: 0,
+            result: PassFail::Pass,
             elapsed_time: 0,
         },
         TargetResult {
             name: "target3".to_string(),
-            exit_code: 0,
+            result: PassFail::Pass,
             elapsed_time: 0,
         },
     ];
