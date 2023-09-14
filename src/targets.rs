@@ -54,7 +54,6 @@ pub fn execute_targets(
     primary_target: Target,
     target_map: &HashMap<String, Target>,
 ) -> Vec<TargetResult> {
-    // TODO: Check for non-existent targets
     let current_command = primary_target.command.clone().unwrap_or_default();
     let pre_targets = primary_target.pre_targets.clone().unwrap_or_default();
     let post_targets = primary_target.post_targets.clone().unwrap_or_default();
@@ -62,6 +61,8 @@ pub fn execute_targets(
     if current_command.is_empty() && pre_targets.is_empty() && post_targets.is_empty() {
         panic!("Targets must have either a command, pre_targets, post_targets, or any combination of the above.")
     }
+
+    // TODO: Check for non-existent targets
 
     let mut command_stack: Vec<TargetResult> = Vec::new();
 

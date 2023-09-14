@@ -29,6 +29,7 @@ To play around further, you can either run `cargo run help` or execute the built
 - [x] Command dependencies (pre/post targets)
 - [ ] Supports Parallelization of Target Execution
 - [ ] Parametrize Commands
+- [ ] Supports Monorepos via `workdir` specification
 - [ ] Cross-Platform
 - [ ] Support Passing Inputs/Outputs
 - [ ] Support Definitions in Multiple Files

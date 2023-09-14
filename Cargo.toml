@@ -17,6 +17,7 @@ anyhow = "1.0.75"
 clap = { version = "4.4.2", features = ["string"] }
 cli-table = "0.4.7"
 colored = "2.0.4"
+rayon = "1.7.0"
 semver = "1.0.18"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_yaml = "0.9.25"

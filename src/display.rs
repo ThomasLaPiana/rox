@@ -1,5 +1,6 @@
-use crate::targets::TargetResult;
+use crate::targets::{PassFail, TargetResult};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
+use colored::Colorize;
 
 pub fn display_execution_results(results: Vec<TargetResult>) {
     let mut table = Vec::new();
@@ -7,7 +8,20 @@ pub fn display_execution_results(results: Vec<TargetResult>) {
     for result in results {
         table.push(vec![
             result.name.cell(),
-            result.result.cell().justify(Justify::Center),
+            match result.result {
+                PassFail::Pass => result
+                    .result
+                    .to_string()
+                    .green()
+                    .cell()
+                    .justify(Justify::Center),
+                PassFail::Fail => result
+                    .result
+                    .to_string()
+                    .red()
+                    .cell()
+                    .justify(Justify::Center),
+            },
             result.elapsed_time.cell().justify(Justify::Center),
             result.file_path.cell().justify(Justify::Right),
         ])
@@ -17,10 +31,10 @@ pub fn display_execution_results(results: Vec<TargetResult>) {
         table
             .table()
             .title(vec![
-                "Name".cell().bold(true),
-                "Result".cell().bold(true),
-                "Elapsed Time (in secs)".cell().bold(true),
-                "File Path".cell().bold(true),
+                "Name".yellow().cell().bold(true),
+                "Result".yellow().cell().bold(true),
+                "Elapsed Time (in secs)".yellow().cell().bold(true),
+                "File Path".yellow().cell().bold(true),
             ])
             .bold(true),
     )
