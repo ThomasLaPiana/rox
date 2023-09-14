@@ -80,3 +80,7 @@ targets:
   - name: precommit
     description: "All things to run before a commit"
     pre_targets: ["clippy_ci", "test"] # It is valid to have no command if there are pre/post targets instead
+
+  - name: test_parallel
+    description: "Depend on unrelated targets to test parallelism safely"
+    pre_targets: ["db", "run", "test"]

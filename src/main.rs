@@ -16,10 +16,7 @@ fn main() {
     let file_path = "roxfile.yml".to_string();
     println!("> Loading Roxfile from path: {}", file_path);
     let roxfile = parser::parse_file_contents(parser::load_file(file_path));
-    color_print(
-        vec!["> File loaded successfully!".to_string()],
-        ColorEnum::Green,
-    );
+    color_print(vec!["> File loaded successfully!"], ColorEnum::Green);
     utils::horizontal_rule();
 
     // Build the CLI

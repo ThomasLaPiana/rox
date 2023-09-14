@@ -38,7 +38,7 @@ pub fn get_result_passfail(result: Result<ExitStatus, std::io::Error>) -> PassFa
 pub fn run_target(target: &Target) -> TargetResult {
     let start = std::time::Instant::now();
     println!("> Running Target: {}", target.name);
-    let (command, args) = utils::split_head_from_rest(target.command.as_ref().unwrap().clone());
+    let (command, args) = utils::split_head_from_rest(&target.command.as_ref().unwrap().clone());
     let command_results = Command::new(command).args(args).status();
 
     TargetResult {

@@ -66,7 +66,7 @@ pub fn check_version(requirements: VersionRequirement) {
         "> Checking version for command:\n\t{}",
         &requirements.command
     );
-    let (command, args) = utils::split_head_from_rest(requirements.command);
+    let (command, args) = utils::split_head_from_rest(&requirements.command);
     let version = get_version_output(command, args, requirements.split.is_some());
     println!("> Found version: {}", version);
 
