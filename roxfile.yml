@@ -88,9 +88,11 @@ tasks:
     pre_tasks: ["build_release", "build_release_image"]
 
   - name: build_release
+    description: "Build a release binary with cargo."
     command: "cargo build --release"
 
   - name: build_release_image
+    description: "Build a production image for Docker."
     command: "docker build . -t rox:latest"
 
   - name: invalid

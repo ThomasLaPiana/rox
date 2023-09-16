@@ -52,6 +52,15 @@ pub fn create_injected_tasks(task: Task) -> Vec<InjectedTask> {
     let raw_command = task.command.unwrap_or_default();
     let parameters = task.parameters.unwrap_or_default();
 
+    if parameters.is_empty() {
+        return vec![InjectedTask {
+            name: task.name.clone(),
+            command: raw_command.clone(),
+            parameters: "N/A".to_string(),
+            file_path: task.file_path.clone().unwrap(),
+        }];
+    }
+
     for parameter in parameters {
         for value in &parameter.values.unwrap() {
             tasks.push(InjectedTask {
