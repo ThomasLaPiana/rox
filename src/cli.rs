@@ -16,6 +16,14 @@ pub fn cli_builder(subcommands: Vec<Command>) -> Command {
                 .action(ArgAction::SetTrue)
                 .help("Force tasks to run in parallel."),
         )
+        .arg(
+            Arg::new("skip-checks")
+                .long("skip-checks")
+                .short('s')
+                .required(false)
+                .action(ArgAction::SetTrue)
+                .help("Skip the version and file requirement checks."),
+        )
         .subcommands(subcommands)
 }
 

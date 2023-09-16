@@ -1,3 +1,4 @@
+//! This is the module responsible for executing tasks.
 use crate::roxfile::Task;
 use crate::utils;
 use rayon::prelude::*;
@@ -61,7 +62,7 @@ pub fn execute_tasks(
     let post_tasks = primary_task.post_tasks.clone().unwrap_or_default();
 
     if current_command.is_empty() && pre_tasks.is_empty() && post_tasks.is_empty() {
-        utils::color_print(vec!["tasks must have either a command, pre_tasks, post_tasks, or any combination of the above."], utils::ColorEnum::Red);
+        utils::color_print(vec!["Tasks must have either a command, pre_tasks, post_tasks, or any combination of the above."], utils::ColorEnum::Red);
         std::process::exit(1);
     }
 

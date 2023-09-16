@@ -51,7 +51,6 @@ pub struct Task {
 pub struct RoxFile {
     pub version_requirements: Option<Vec<VersionRequirement>>,
     pub file_requirements: Option<Vec<FileRequirement>>,
-    pub always_check_requirements: Option<bool>,
     pub tasks: Vec<Task>,
     pub additional_files: Option<Vec<String>>,
 }

@@ -8,6 +8,7 @@ use utils::{color_print, ColorEnum};
 mod cli;
 mod output;
 
+// Entrypoint for the Crate CLI
 fn main() {
     let start = std::time::Instant::now();
 
@@ -32,12 +33,12 @@ fn main() {
     let cli = cli::cli_builder(subcommands);
     let cli_matches = cli.get_matches();
 
-    // Build a HashMap of the tasks and their objects
+    // Build a HashMap of the task names and their objects
     let task_map: HashMap<String, roxfile::Task> = std::collections::HashMap::from_iter(
         tasks.into_iter().map(|task| (task.name.clone(), task)),
     );
 
-    if roxfile.always_check_requirements.is_some() {
+    if !cli_matches.get_flag("skip-checks") {
         // Check Versions
         if roxfile.version_requirements.is_some() {
             println!("> Checking versions...");

@@ -30,7 +30,8 @@ To play around further, you can either run `cargo run help` or execute the built
 - [x] Supports Parallelization of Task Execution
 - [ ] Parametrize Commands
 - [ ] Supports Monorepos via `workdir` specification
-- [ ] Cross-Platform
+- [ ] Cross-Platform Support
 - [ ] Support Passing Inputs/Outputs
 - [ ] Support Definitions in Multiple Files
 - [ ] First-Class support for Git Operations?
+- [ ] Thoroughly Documented, with examples
