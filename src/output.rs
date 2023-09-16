@@ -1,8 +1,8 @@
-use crate::runner::{PassFail, TargetResult};
+use crate::task_runner::{PassFail, TaskResult};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
 use colored::Colorize;
 
-pub fn display_execution_results(results: Vec<TargetResult>) {
+pub fn display_execution_results(results: Vec<TaskResult>) {
     let mut table = Vec::new();
 
     for result in results {

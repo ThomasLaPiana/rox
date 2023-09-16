@@ -1,12 +1,12 @@
 mod file_requirements;
 mod roxfile;
-mod runner;
+mod task_runner;
 mod utils;
 mod version_requirements;
 use std::collections::HashMap;
 use utils::{color_print, ColorEnum};
 mod cli;
-mod display;
+mod output;
 
 fn main() {
     let start = std::time::Instant::now();
@@ -19,24 +19,22 @@ fn main() {
     utils::horizontal_rule();
 
     // Build the CLI
-    let mut unsorted_targets: Vec<roxfile::Target> = roxfile
-        .targets
+    let mut unsorted_tasks: Vec<roxfile::Task> = roxfile
+        .tasks
         .clone()
         .iter()
-        .map(|target| roxfile::target_builder(target.to_owned(), "roxfile.yml".to_string()))
+        .map(|task| roxfile::task_builder(task.to_owned(), "roxfile.yml".to_string()))
         .collect();
 
-    unsorted_targets.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
-    let targets = unsorted_targets;
-    let subcommands = cli::build_sub_commands(targets.clone());
+    unsorted_tasks.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
+    let tasks = unsorted_tasks;
+    let subcommands = cli::build_sub_commands(tasks.clone());
     let cli = cli::cli_builder(subcommands);
     let cli_matches = cli.get_matches();
 
-    // Build a HashMap of the targets and their objects
-    let target_map: HashMap<String, roxfile::Target> = std::collections::HashMap::from_iter(
-        targets
-            .into_iter()
-            .map(|target| (target.name.clone(), target)),
+    // Build a HashMap of the tasks and their objects
+    let task_map: HashMap<String, roxfile::Task> = std::collections::HashMap::from_iter(
+        tasks.into_iter().map(|task| (task.name.clone(), task)),
     );
 
     if roxfile.always_check_requirements.is_some() {
@@ -60,11 +58,11 @@ fn main() {
     }
 
     let parallel = cli_matches.get_flag("parallel");
-    let target_stuff = target_map
+    let task_stuff = task_map
         .get(cli_matches.subcommand_name().unwrap())
         .unwrap();
-    let results = runner::execute_targets(target_stuff.to_owned(), &target_map, parallel);
-    display::display_execution_results(results);
+    let results = task_runner::execute_tasks(task_stuff.to_owned(), &task_map, parallel);
+    output::display_execution_results(results);
 
     println!("> Total elapsed time: {}s", start.elapsed().as_secs());
 }

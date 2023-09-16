@@ -1,4 +1,4 @@
-/// Contains the Structs for the Syntax of the Rox file
+/// Contains the Structs for the Syntax of the Roxfile
 /// Maps 1:1 with the structure of the YAML
 use serde::Deserialize;
 
@@ -10,14 +10,14 @@ pub fn parse_file_contents(contents: String) -> RoxFile {
     serde_yaml::from_str(&contents).expect("Failed to parse the Roxfile!")
 }
 
-/// This function builds each target and injects related metadata
-pub fn target_builder(target: Target, file_path: String) -> Target {
-    Target {
-        name: target.name,
-        command: target.command,
-        description: target.description,
-        pre_targets: target.pre_targets,
-        post_targets: target.post_targets,
+/// This function builds each task and injects related metadata
+pub fn task_builder(task: Task, file_path: String) -> Task {
+    Task {
+        name: task.name,
+        command: task.command,
+        description: task.description,
+        pre_tasks: task.pre_tasks,
+        post_tasks: task.post_tasks,
         file_path: Some(file_path),
     }
 }
@@ -37,12 +37,12 @@ pub struct FileRequirement {
 }
 
 #[derive(Deserialize, Debug, Clone, Default)]
-pub struct Target {
+pub struct Task {
     pub name: String,
     pub command: Option<String>, // This is optional because it is valid if there are pre or post hooks
     pub description: Option<String>,
-    pub pre_targets: Option<Vec<String>>,
-    pub post_targets: Option<Vec<String>>,
+    pub pre_tasks: Option<Vec<String>>,
+    pub post_tasks: Option<Vec<String>>,
     pub file_path: Option<String>,
 }
 
@@ -52,6 +52,6 @@ pub struct RoxFile {
     pub version_requirements: Option<Vec<VersionRequirement>>,
     pub file_requirements: Option<Vec<FileRequirement>>,
     pub always_check_requirements: Option<bool>,
-    pub targets: Vec<Target>,
+    pub tasks: Vec<Task>,
     pub additional_files: Option<Vec<String>>,
 }

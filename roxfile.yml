@@ -25,7 +25,7 @@ file_requirements: # Verify that these files exist
   - path: ".env"
     create_if_not_exists: true # Create the file if it doesn't exist 
 
-targets:
+tasks:
 
   #------------------------------------------------
   # This section is for unimplemented functionality
@@ -85,3 +85,6 @@ targets:
     description: "Depend on unrelated targets to test parallelism safely"
     pre_targets: ["db", "run", "test"]
     parallel: true
+
+  - name: invalid
+    description: "This task will throw an error becasue it has nothing to do!"

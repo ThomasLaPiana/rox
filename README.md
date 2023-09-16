@@ -27,7 +27,7 @@ To play around further, you can either run `cargo run help` or execute the built
 - [x] Enforce that certain files exist (i.e. a `.env` file)
 - [x] Show elapsed time all commands
 - [x] Command dependencies (pre/post targets)
-- [ ] Supports Parallelization of Target Execution
+- [x] Supports Parallelization of Task Execution
 - [ ] Parametrize Commands
 - [ ] Supports Monorepos via `workdir` specification
 - [ ] Cross-Platform
