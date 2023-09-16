@@ -1,5 +1,6 @@
-use crate::syntax::Target;
+use crate::roxfile::Target;
 use crate::utils;
+use rayon::prelude::*;
 use std::collections::HashMap;
 use std::process::{Command, ExitStatus};
 
@@ -53,6 +54,7 @@ pub fn run_target(target: &Target) -> TargetResult {
 pub fn execute_targets(
     primary_target: Target,
     target_map: &HashMap<String, Target>,
+    parallel: bool,
 ) -> Vec<TargetResult> {
     let current_command = primary_target.command.clone().unwrap_or_default();
     let pre_targets = primary_target.pre_targets.clone().unwrap_or_default();
@@ -64,37 +66,30 @@ pub fn execute_targets(
 
     // TODO: Check for non-existent targets
 
-    let mut command_stack: Vec<TargetResult> = Vec::new();
+    let mut task_stack: Vec<Target> = Vec::new();
 
     // Handle Pre-Targets
-    if !pre_targets.is_empty() {
-        println!(
-            "Target: '{}' has the following pre targets: {:?}",
-            primary_target.name, pre_targets
-        );
-        for target in pre_targets {
-            let t = target_map.get(&target).unwrap().to_owned();
-            command_stack.push(run_target(&t));
-        }
+    for target in pre_targets.clone() {
+        let t = target_map.get(&target).unwrap().to_owned();
+        task_stack.push(t);
     }
 
     // Handle Primary Target
     if !current_command.is_empty() {
-        command_stack.push(run_target(&primary_target));
+        task_stack.push(primary_target);
     }
 
     // Handle Post-Targets
-    if !post_targets.is_empty() {
-        println!(
-            "Target: {} has the following pre targets: {:?}",
-            primary_target.name, post_targets
-        );
-        for target in post_targets {
-            let t = target_map.get(&target).unwrap().to_owned();
-            command_stack.push(run_target(&t));
-        }
+    for target in post_targets {
+        let t = target_map.get(&target).unwrap().to_owned();
+        task_stack.push(t);
     }
-    command_stack
+
+    if parallel {
+        return task_stack.par_iter().map(run_target).collect();
+    } else {
+        return task_stack.iter().map(run_target).collect();
+    }
 }
 
 #[test]
@@ -196,7 +191,7 @@ fn test_execution_order() {
     test_target_map.insert("target2".to_string(), target2);
     test_target_map.insert("target3".to_string(), target3);
     test_target_map.insert("target4".to_string(), target4);
-    let output = execute_targets(target1, &test_target_map);
+    let output = execute_targets(target1, &test_target_map, false);
     let expected_output = vec![
         TargetResult {
             name: "target2".to_string(),
@@ -250,7 +245,7 @@ fn test_duplicate_command_execution() {
     test_target_map.insert("target1".to_string(), target1.clone());
     test_target_map.insert("target2".to_string(), target2);
     test_target_map.insert("target3".to_string(), target3);
-    let output = execute_targets(target1, &test_target_map);
+    let output = execute_targets(target1, &test_target_map, false);
     let expected_output = vec![
         TargetResult {
             name: "target2".to_string(),

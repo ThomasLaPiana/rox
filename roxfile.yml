@@ -84,3 +84,4 @@ targets:
   - name: test_parallel
     description: "Depend on unrelated targets to test parallelism safely"
     pre_targets: ["db", "run", "test"]
+    parallel: true

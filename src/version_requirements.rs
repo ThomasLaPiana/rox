@@ -1,4 +1,4 @@
-use crate::syntax::VersionRequirement;
+use crate::roxfile::VersionRequirement;
 use crate::utils;
 use semver::{Version, VersionReq};
 use std::{

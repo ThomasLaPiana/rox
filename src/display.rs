@@ -1,4 +1,4 @@
-use crate::targets::{PassFail, TargetResult};
+use crate::runner::{PassFail, TargetResult};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
 use colored::Colorize;
 

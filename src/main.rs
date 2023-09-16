@@ -1,7 +1,6 @@
 mod file_requirements;
-mod parser;
-mod syntax;
-mod targets;
+mod roxfile;
+mod runner;
 mod utils;
 mod version_requirements;
 use std::collections::HashMap;
@@ -15,16 +14,16 @@ fn main() {
     // Load in the Roxfile(s)
     let file_path = "roxfile.yml".to_string();
     println!("> Loading Roxfile from path: {}", file_path);
-    let roxfile = parser::parse_file_contents(parser::load_file(file_path));
+    let roxfile = roxfile::parse_file_contents(roxfile::load_file(file_path));
     color_print(vec!["> File loaded successfully!"], ColorEnum::Green);
     utils::horizontal_rule();
 
     // Build the CLI
-    let mut unsorted_targets: Vec<syntax::Target> = roxfile
+    let mut unsorted_targets: Vec<roxfile::Target> = roxfile
         .targets
         .clone()
         .iter()
-        .map(|target| syntax::target_builder(target.to_owned(), "roxfile.yml".to_string()))
+        .map(|target| roxfile::target_builder(target.to_owned(), "roxfile.yml".to_string()))
         .collect();
 
     unsorted_targets.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
@@ -34,7 +33,7 @@ fn main() {
     let cli_matches = cli.get_matches();
 
     // Build a HashMap of the targets and their objects
-    let target_map: HashMap<String, syntax::Target> = std::collections::HashMap::from_iter(
+    let target_map: HashMap<String, roxfile::Target> = std::collections::HashMap::from_iter(
         targets
             .into_iter()
             .map(|target| (target.name.clone(), target)),
@@ -60,11 +59,11 @@ fn main() {
         utils::horizontal_rule();
     }
 
-    // Nab the primary target and pass it to the executor
+    let parallel = cli_matches.get_flag("parallel");
     let target_stuff = target_map
         .get(cli_matches.subcommand_name().unwrap())
         .unwrap();
-    let results = targets::execute_targets(target_stuff.to_owned(), &target_map);
+    let results = runner::execute_targets(target_stuff.to_owned(), &target_map, parallel);
     display::display_execution_results(results);
 
     println!("> Total elapsed time: {}s", start.elapsed().as_secs());
