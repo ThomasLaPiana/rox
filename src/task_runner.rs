@@ -20,6 +20,7 @@ impl std::fmt::Display for PassFail {
 pub struct TaskResult {
     pub name: String,
     pub result: PassFail,
+    pub parameters: String,
     pub elapsed_time: u64,
     pub file_path: String,
 }
@@ -37,17 +38,47 @@ pub fn get_result_passfail(result: Result<ExitStatus, std::io::Error>) -> PassFa
     PassFail::Fail
 }
 
-pub fn run_task(task: &Task) -> TaskResult {
+/// The struct for a Task that has been injected with Parameter values
+pub struct InjectedTask {
+    name: String,
+    command: String,
+    parameters: String,
+    file_path: String,
+}
+
+/// Create a vector of tasks based on the Paramaters field
+pub fn create_injected_tasks(task: Task) -> Vec<InjectedTask> {
+    let mut tasks: Vec<InjectedTask> = Vec::new();
+    let raw_command = task.command.unwrap_or_default();
+    let parameters = task.parameters.unwrap_or_default();
+
+    for parameter in parameters {
+        for value in &parameter.values.unwrap() {
+            tasks.push(InjectedTask {
+                name: task.name.clone(),
+                command: raw_command.clone().replace(&parameter.symbol, value),
+                parameters: format!("{}={}", &parameter.symbol, value),
+                file_path: task.file_path.clone().unwrap(),
+            })
+        }
+    }
+    tasks
+}
+
+/// Run a Task
+pub fn run_task(task: &InjectedTask) -> TaskResult {
     let start = std::time::Instant::now();
     println!("> Running task: {}", task.name);
-    let (command, args) = utils::split_head_from_rest(&task.command.as_ref().unwrap().clone());
+
+    let (command, args) = utils::split_head_from_rest(&task.command);
     let command_results = Command::new(command).args(args).status();
 
     TaskResult {
         name: task.name.to_string(),
         result: get_result_passfail(command_results),
+        parameters: task.parameters.clone(),
         elapsed_time: start.elapsed().as_secs(),
-        file_path: task.file_path.clone().unwrap(),
+        file_path: task.file_path.clone(),
     }
 }
 
@@ -68,23 +99,23 @@ pub fn execute_tasks(
 
     // TODO: Check for non-existent tasks
 
-    let mut task_stack: Vec<Task> = Vec::new();
+    let mut task_stack: Vec<InjectedTask> = Vec::new();
 
     // Handle Pre-tasks
-    for task in pre_tasks.clone() {
-        let t = task_map.get(&task).unwrap().to_owned();
-        task_stack.push(t);
+    for task in pre_tasks.into_iter() {
+        let t = create_injected_tasks(task_map.get(&task).unwrap().to_owned());
+        task_stack.extend(t);
     }
 
     // Handle Primary task
     if !current_command.is_empty() {
-        task_stack.push(primary_task);
+        task_stack.extend(create_injected_tasks(primary_task));
     }
 
     // Handle Post-tasks
     for task in post_tasks {
-        let t = task_map.get(&task).unwrap().to_owned();
-        task_stack.push(t);
+        let t = create_injected_tasks(task_map.get(&task).unwrap().to_owned());
+        task_stack.extend(t);
     }
 
     if parallel {

@@ -58,6 +58,7 @@ fn main() {
         utils::horizontal_rule();
     }
 
+    // Execute the Tasks
     let parallel = cli_matches.get_flag("parallel");
     let task_stuff = task_map
         .get(cli_matches.subcommand_name().unwrap())

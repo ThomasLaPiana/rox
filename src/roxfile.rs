@@ -19,6 +19,7 @@ pub fn task_builder(task: Task, file_path: String) -> Task {
         pre_tasks: task.pre_tasks,
         post_tasks: task.post_tasks,
         file_path: Some(file_path),
+        parameters: task.parameters,
     }
 }
 
@@ -44,6 +45,13 @@ pub struct Task {
     pub pre_tasks: Option<Vec<String>>,
     pub post_tasks: Option<Vec<String>>,
     pub file_path: Option<String>,
+    pub parameters: Option<Vec<Parameter>>,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct Parameter {
+    pub symbol: String,
+    pub values: Option<Vec<String>>,
 }
 
 /// The top-level structure of the Roxfile

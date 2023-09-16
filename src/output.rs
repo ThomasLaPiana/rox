@@ -22,6 +22,7 @@ pub fn display_execution_results(results: Vec<TaskResult>) {
                     .cell()
                     .justify(Justify::Center),
             },
+            result.parameters.cell().justify(Justify::Center),
             result.elapsed_time.cell().justify(Justify::Center),
             result.file_path.cell().justify(Justify::Right),
         ])
@@ -33,7 +34,8 @@ pub fn display_execution_results(results: Vec<TaskResult>) {
             .title(vec![
                 "Name".yellow().cell().bold(true),
                 "Result".yellow().cell().bold(true),
-                "Elapsed Time (in secs)".yellow().cell().bold(true),
+                "Parameters".yellow().cell().bold(true),
+                "Elapsed Time(s)".yellow().cell().bold(true),
                 "File Path".yellow().cell().bold(true),
             ])
             .bold(true),

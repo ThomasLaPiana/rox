@@ -10,6 +10,10 @@ version_requirements:
     minimum_version: "20.10.7"
     maximum_version: "21.0.0"
 
+  - command: "cargo watch --version"
+    minimum_version: "8.1.7"
+    split: true
+
   - command: "python --version" # Python 3.9.13
     # Splits on spaces and grabs the last output token,
     # useful for avoiding bash manipulation of output
@@ -30,9 +34,6 @@ tasks:
   # Run only the specified params, errors if no match
   # rox docker_build -foo prod
   - name: cargo
-    parameters:
-      - symbol: foo # Rox will look for and replace $foo in both the command and arguments
-        values: ["fmt", "clippy", "test"]
     command: "cargo $foo"
     description: "Run various cargo subcommands/tools"
     workdir: "/src" # Specify a workdir for the command, which makes it easier to use with Monorepos
@@ -42,7 +43,10 @@ tasks:
   #--------------------------------------------------------
   - name: db
     description: "Build the application dockerfile"
-    command: "docker build . -t rox:local"
+    parameters:
+      - symbol: "{image_name}" # There is a "dumb" find and replace for this symbol in the command
+        values: ["rox:local", "rox:latest"]
+    command: "docker build . -t {image_name}"
 
   - name: dr
     description: "Run 'help' for the packaged Docker application"
