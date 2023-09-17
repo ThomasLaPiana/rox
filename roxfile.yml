@@ -50,10 +50,12 @@ tasks:
     substitutions:
         # The name used to call this substitution
       - name: "prod"
+        description: "Build arguments for the prod image."
         # The values to replpace the tokens, as positional arguments
         values: ["./", "latest"]
 
       - name: "dev"
+        description: "Build arguments for the dev image."
         values: [".", "local"]
 
 

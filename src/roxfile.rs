@@ -74,6 +74,7 @@ pub struct Task {
 pub struct Substitution {
     pub name: String,
     pub values: Vec<String>,
+    pub description: Option<String>,
 }
 
 /// The top-level structure of the Roxfile
