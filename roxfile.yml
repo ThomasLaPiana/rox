@@ -43,10 +43,19 @@ tasks:
   #--------------------------------------------------------
   - name: db
     description: "Build the application dockerfile"
-    parameters:
-      - symbol: "{image_name}" # There is a "dumb" find and replace for this symbol in the command
-        values: ["rox:local", "rox:latest"]
-    command: "docker build . -t {image_name}"
+    command: "docker build {path} -t rox:{image_tag}"
+    # The tokens to replace in the `command`
+    symbols: ["{path}", "{image_tag}"]
+    # The list of args for token substitution
+    substitutions:
+        # The name used to call this substitution
+      - name: "prod"
+        # The values to replpace the tokens, as positional arguments
+        values: ["./", "latest"]
+
+      - name: "dev"
+        values: [".", "local"]
+
 
   - name: dr
     description: "Run 'help' for the packaged Docker application"
@@ -85,9 +94,9 @@ tasks:
   # Release-related
   - name: build_all
     description: "Build a release artifact binary and Docker image"
-    pre_tasks: ["build_release", "build_release_image"]
+    pre_tasks: ["build_release_binary", "build_release_image"]
 
-  - name: build_release
+  - name: build_release_binary
     description: "Build a release binary with cargo."
     command: "cargo build --release"
 

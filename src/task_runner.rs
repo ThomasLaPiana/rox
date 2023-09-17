@@ -1,6 +1,6 @@
 //! This is the module responsible for executing tasks.
 use crate::roxfile::Task;
-use crate::utils;
+use crate::utils::{self, color_print};
 use rayon::prelude::*;
 use std::collections::HashMap;
 use std::process::{Command, ExitStatus};
@@ -50,9 +50,21 @@ pub struct InjectedTask {
 pub fn create_injected_tasks(task: Task) -> Vec<InjectedTask> {
     let mut tasks: Vec<InjectedTask> = Vec::new();
     let raw_command = task.command.unwrap_or_default();
-    let parameters = task.parameters.unwrap_or_default();
+    let symbols = task.symbols.unwrap_or_default();
+    let substitutions = task.substitutions.unwrap_or_default();
 
-    if parameters.is_empty() {
+    if symbols.is_empty()
+        && !substitutions.is_empty() | !symbols.is_empty()
+        && substitutions.is_empty()
+    {
+        color_print(
+            vec!["Symbols and Substitutions must both be set if one is!"],
+            utils::ColorEnum::Red,
+        );
+        panic!()
+    }
+
+    if symbols.is_empty() {
         return vec![InjectedTask {
             name: task.name.clone(),
             command: raw_command.clone(),
@@ -61,15 +73,29 @@ pub fn create_injected_tasks(task: Task) -> Vec<InjectedTask> {
         }];
     }
 
-    for parameter in parameters {
-        for value in &parameter.values.unwrap() {
-            tasks.push(InjectedTask {
-                name: task.name.clone(),
-                command: raw_command.clone().replace(&parameter.symbol, value),
-                parameters: format!("{}={}", &parameter.symbol, value),
-                file_path: task.file_path.clone().unwrap(),
-            })
-        }
+    for substitution in &substitutions {
+        tasks.push(InjectedTask {
+            name: task.name.clone(),
+            command: {
+                let mut replaced_command = raw_command.clone();
+                for index in 0..substitutions.len() {
+                    replaced_command =
+                        replaced_command.replace(&symbols[index], &substitution.values[index]);
+                }
+                replaced_command
+            },
+            parameters: {
+                let mut parameters = String::new();
+                for index in 0..substitutions.len() {
+                    parameters.push_str(&format!(
+                        "{}={}\n",
+                        &symbols[index], &substitution.values[index]
+                    ))
+                }
+                parameters
+            },
+            file_path: task.file_path.clone().unwrap(),
+        })
     }
     tasks
 }

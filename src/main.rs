@@ -1,15 +1,15 @@
-mod file_requirements;
-mod roxfile;
-mod task_runner;
-mod utils;
-mod version_requirements;
+pub mod file_requirements;
+pub mod roxfile;
+pub mod task_runner;
+pub mod utils;
+pub mod version_requirements;
 use std::collections::HashMap;
 use utils::{color_print, ColorEnum};
-mod cli;
-mod output;
+pub mod cli;
+pub mod output;
 
 // Entrypoint for the Crate CLI
-fn main() {
+pub fn main() {
     let start = std::time::Instant::now();
 
     // Load in the Roxfile(s)

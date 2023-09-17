@@ -1,11 +1,15 @@
-/// Contains the Structs for the Syntax of the Roxfile
+//! Contains the Structs for the Syntax of the Roxfile
+//! as well as the logic for validation.
+//!
 /// Maps 1:1 with the structure of the YAML
 use serde::Deserialize;
 
+/// Load a file
 pub fn load_file(file_path: String) -> String {
     std::fs::read_to_string(file_path).expect("Failed to read the Roxfile!")
 }
 
+/// Parse a Roxfile into Rust structs
 pub fn parse_file_contents(contents: String) -> RoxFile {
     serde_yaml::from_str(&contents).expect("Failed to parse the Roxfile!")
 }
@@ -19,10 +23,12 @@ pub fn task_builder(task: Task, file_path: String) -> Task {
         pre_tasks: task.pre_tasks,
         post_tasks: task.post_tasks,
         file_path: Some(file_path),
-        parameters: task.parameters,
+        symbols: task.symbols,
+        substitutions: task.substitutions,
     }
 }
 
+/// Schema for Version Requirement Checks
 #[derive(Deserialize, Debug, Clone, Default)]
 pub struct VersionRequirement {
     pub command: String,
@@ -31,12 +37,19 @@ pub struct VersionRequirement {
     pub split: Option<bool>,
 }
 
+/// Schema for File Requirement Checks
+/// This verifies that the file exists locally,
+/// or can be configured to create the file
+/// if its missing.
 #[derive(Deserialize, Debug, Clone, Default)]
 pub struct FileRequirement {
     pub path: String,
     pub create_if_not_exists: Option<bool>,
 }
 
+/// Schema for Tasks in the Roxfile
+/// Tasks are discrete units of execution
+/// that send commands to the shell.
 #[derive(Deserialize, Debug, Clone, Default)]
 pub struct Task {
     pub name: String,
@@ -45,13 +58,14 @@ pub struct Task {
     pub pre_tasks: Option<Vec<String>>,
     pub post_tasks: Option<Vec<String>>,
     pub file_path: Option<String>,
-    pub parameters: Option<Vec<Parameter>>,
+    pub symbols: Option<Vec<String>>,
+    pub substitutions: Option<Vec<Substitution>>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct Parameter {
-    pub symbol: String,
-    pub values: Option<Vec<String>>,
+pub struct Substitution {
+    pub name: String,
+    pub values: Vec<String>,
 }
 
 /// The top-level structure of the Roxfile
