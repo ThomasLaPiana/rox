@@ -1,3 +1,4 @@
+//! Check version requirements defined in the Roxfile.
 use crate::roxfile::VersionRequirement;
 use crate::utils;
 use semver::{Version, VersionReq};
@@ -6,7 +7,7 @@ use std::{
     str::FromStr,
 };
 
-// Run the command and get the version output
+// Run the specific command and get the version output
 fn get_version_output(command: String, args: Vec<String>, split_output: bool) -> String {
     let command_output: Output = Command::new(command)
         .args(args)
@@ -28,7 +29,7 @@ enum VersionCheck {
     Valid,
 }
 
-// Parse Strings into Versions and Compare
+/// Parse Strings into Versions and Compare
 fn compare_versions(
     version: String,
     minver: Option<String>,
@@ -61,6 +62,8 @@ fn compare_versions(
     VersionCheck::Valid
 }
 
+/// Compose the various version check logic functions into a
+/// functional pipeline.
 pub fn check_version(requirements: VersionRequirement) {
     println!(
         "> Checking version for command:\n\t{}",

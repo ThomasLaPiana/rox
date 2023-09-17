@@ -38,6 +38,7 @@ pub fn main() {
         tasks.into_iter().map(|task| (task.name.clone(), task)),
     );
 
+    // Run File and Version checks
     if !cli_matches.get_flag("skip-checks") {
         // Check Versions
         if roxfile.version_requirements.is_some() {

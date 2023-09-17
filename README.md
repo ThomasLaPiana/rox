@@ -28,9 +28,7 @@ To play around further, you can either run `cargo run help` or execute the built
 - [x] Show elapsed time all commands
 - [x] Command dependencies (pre/post targets)
 - [x] Supports Parallelization of Task Execution
-- [x] Parametrize Commands
+- [ ] Parametrize Commands
 - [ ] Supports Monorepos via `workdir` specification
-- [ ] Cross-Platform Support
-- [ ] Support Passing Inputs/Outputs
+- [ ] Multiple Platform Builds
 - [ ] Support Definitions in Multiple Files
-- [ ] Thoroughly Documented, with examples

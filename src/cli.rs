@@ -30,7 +30,13 @@ pub fn cli_builder(subcommands: Vec<Command>) -> Command {
 
 /// Build Subcommands to add to the CLI
 pub fn build_sub_commands(tasks: Vec<Task>) -> Vec<Command> {
-    let additional_commands = tasks
+    // Filter out Tasks that are set to `hide: true`
+    let filtered_tasks: Vec<&Task> = tasks
+        .iter()
+        .filter(|target| !target.hide.unwrap_or_default())
+        .collect();
+
+    let additional_commands = filtered_tasks
         .iter()
         .map(|task| Command::new(&task.name).about(task.description.clone().unwrap_or_default()))
         .collect();

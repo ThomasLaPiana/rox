@@ -1,3 +1,4 @@
+//! Utility Functions
 use std::fmt::Display;
 
 use colored::Colorize;
