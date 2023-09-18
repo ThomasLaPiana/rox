@@ -1,0 +1,12 @@
+> Loading Roxfile from path: roxfile.yml
+> File loaded successfully!
+-------------------------------------------
+> Running task: build-release-binary
+    Finished release [optimized] target(s) in 0.13s
++----------------------+--------+-----------------+-------------+
+| Name                 | Result | Elapsed Time(s) | File Path 
+  |
++----------------------+--------+-----------------+-------------+
+| build-release-binary |  Pass  |        0        | roxfile.yml |
++----------------------+--------+-----------------+-------------+
+> Total elapsed time: 0s
