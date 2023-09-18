@@ -3,28 +3,13 @@
 use serde::Deserialize;
 
 /// Load a file into a String
-pub fn load_file(file_path: String) -> String {
+pub fn load_file(file_path: &str) -> String {
     std::fs::read_to_string(file_path).expect("Failed to read the Roxfile!")
 }
 
 /// Parse a Roxfile into Rust structs
 pub fn parse_file_contents(contents: String) -> RoxFile {
     serde_yaml::from_str(&contents).expect("Failed to parse the Roxfile!")
-}
-
-/// Rebuilds each Task with injected metadata
-pub fn task_builder(task: Task, file_path: String) -> Task {
-    Task {
-        name: task.name,
-        command: task.command,
-        description: task.description,
-        pre_tasks: task.pre_tasks,
-        post_tasks: task.post_tasks,
-        file_path: Some(file_path),
-        symbols: task.symbols,
-        substitutions: task.substitutions,
-        hide: task.hide,
-    }
 }
 
 /// Schema for Version Requirement Checks
@@ -37,7 +22,7 @@ pub struct VersionRequirement {
     pub command: String,
     pub minimum_version: Option<String>,
     pub maximum_version: Option<String>,
-    pub split: Option<bool>,
+    pub split: Option<bool>, // TODO: Make this name more clear, or let the user choose with item to take after split
 }
 
 /// Schema for File Requirement Checks
@@ -58,23 +43,34 @@ pub struct FileRequirement {
 #[derive(Deserialize, Debug, Clone, Default)]
 pub struct Task {
     pub name: String,
-    pub command: Option<String>, // This is optional because it is valid if there are pre or post hooks
+    pub command: Option<String>,
     pub description: Option<String>,
-    pub pre_tasks: Option<Vec<String>>,
-    pub post_tasks: Option<Vec<String>>,
     pub file_path: Option<String>,
-    pub symbols: Option<Vec<String>>,
-    pub substitutions: Option<Vec<Substitution>>,
+    pub uses: Option<String>,
+    pub values: Option<Vec<String>>,
     pub hide: Option<bool>,
 }
 
-/// The name and set of values to inject into the command,
-/// based on the `symbols` field.
-#[derive(Deserialize, Debug, Clone)]
-pub struct Substitution {
+/// Schema for Templates
+///
+/// Templates are injectable commands that
+/// can be used by tasks.
+#[derive(Deserialize, Debug, Default)]
+pub struct Template {
     pub name: String,
-    pub values: Vec<String>,
+    pub command: String,
+    pub symbols: Vec<String>,
+}
+
+/// Schema for Pipelines
+///
+/// Pipelines are collections of tasks.
+#[derive(Deserialize, Debug, Clone, Default)]
+pub struct Pipeline {
+    pub name: String,
     pub description: Option<String>,
+    pub tasks: Vec<String>,
+    pub file_path: Option<String>,
 }
 
 /// The top-level structure of the Roxfile
@@ -83,5 +79,7 @@ pub struct RoxFile {
     pub version_requirements: Option<Vec<VersionRequirement>>,
     pub file_requirements: Option<Vec<FileRequirement>>,
     pub tasks: Vec<Task>,
+    pub pipelines: Option<Vec<Pipeline>>,
+    pub templates: Option<Vec<Template>>,
     pub additional_files: Option<Vec<String>>,
 }

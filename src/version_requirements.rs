@@ -1,5 +1,5 @@
 //! Check version requirements defined in the Roxfile.
-use crate::roxfile::VersionRequirement;
+use crate::models::VersionRequirement;
 use crate::utils;
 use semver::{Version, VersionReq};
 use std::{

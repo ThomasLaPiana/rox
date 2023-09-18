@@ -1,21 +1,13 @@
-use crate::roxfile::Task;
-use clap::{Arg, ArgAction, Command};
+use crate::models::{Pipeline, Task};
+use clap::{crate_version, Arg, ArgAction, Command};
 
 /// Construct the CLI
-pub fn cli_builder(subcommands: Vec<Command>) -> Command {
+pub fn cli_builder() -> Command {
     Command::new("rox")
         .about("Rox: The Robust Developer Experience CLI")
+        .version(crate_version!())
         .arg_required_else_help(true)
-        // TODO: Add a flag to ignore pre/post tasks?
         // TODO: Add a "watch" flag to run the command on file changes to a path
-        .arg(
-            Arg::new("parallel")
-                .long("parallel")
-                .short('p')
-                .required(false)
-                .action(ArgAction::SetTrue)
-                .help("Run tasks in parallel."),
-        )
         .arg(
             Arg::new("skip-checks")
                 .long("skip-checks")
@@ -24,21 +16,35 @@ pub fn cli_builder(subcommands: Vec<Command>) -> Command {
                 .action(ArgAction::SetTrue)
                 .help("Skip the version and file requirement checks."),
         )
-        // Add an argument for passing Parameter values
-        .subcommands(subcommands)
-}
-
-/// Builds a Command for each Task
-fn build_command(task: &Task) -> Command {
-    Command::new(&task.name).about(task.description.clone().unwrap_or_default())
 }
 
 /// Build Commands to add to the CLI
-pub fn build_sub_commands(tasks: Vec<Task>) -> Vec<Command> {
-    let additional_commands = tasks
+
+/// Build the `task` subcommand with individual tasks nested as subcommands
+pub fn build_task_subcommands(tasks: &Vec<Task>) -> Command {
+    let subcommands: Vec<Command> = tasks
         .iter()
         .filter(|target| !target.hide.unwrap_or_default())
-        .map(build_command)
+        .map(|task| Command::new(&task.name).about(task.description.clone().unwrap_or_default()))
         .collect();
-    additional_commands
+
+    Command::new("task")
+        .about("Single executable tasks.")
+        .long_about("Discrete units of execution containing a single runnable command.")
+        .subcommands(subcommands)
+}
+
+/// Build the `pipelines` subcommand with individual pipelines as subcommands
+pub fn build_pipeline_subcommands(pipelines: &Vec<Pipeline>) -> Command {
+    let subcommands: Vec<Command> = pipelines
+        .iter()
+        .map(|pipeline| {
+            Command::new(&pipeline.name).about(pipeline.description.clone().unwrap_or_default())
+        })
+        .collect();
+
+    Command::new("pl")
+        .about("Executable pipelines.")
+        .long_about("A group of tasks composed into an executable pipeline.")
+        .subcommands(subcommands)
 }

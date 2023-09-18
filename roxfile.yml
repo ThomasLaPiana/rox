@@ -26,39 +26,42 @@ file_requirements: # Verify that these files exist
   - path: ".env"
     create_if_not_exists: true # Create the file if it doesn't exist 
 
+# Contains templates for commands that can be used by tasks
+templates:
+  - name: docker_build
+    command: "docker build {path} -t rox:{image_tag}"
+    symbols: ["{path}", "{image_tag}"]
+
+pipelines:
+  - name: build-all
+    description: "Build a release artifact binary and Docker image"
+    tasks: ["build_release_binary", "build_release_image"]
+
+
 tasks:
 
   #------------------------------------------------
   # This section is for unimplemented functionality
   #------------------------------------------------
-  # Run only the specified params, errors if no match
-  # rox docker_build -foo prod
   - name: cargo
     command: "cargo $foo"
     description: "Run various cargo subcommands/tools"
     workdir: "/src" # Specify a workdir for the command, which makes it easier to use with Monorepos
 
+  - name: build-local
+    description: "Build the application dockerfile"
+    uses: docker_build
+    values: [".", "local"]
+
+  - name: build-prod
+    description: "Build the application dockerfile"
+    uses: docker_build
+    values: [".", "latest"]
+
+
   #--------------------------------------------------------
   # This section is for _already_ implemented functionality
   #--------------------------------------------------------
-  - name: db
-    description: "Build the application dockerfile"
-    command: "docker build {path} -t rox:{image_tag}"
-    # The tokens to replace in the `command`
-    symbols: ["{path}", "{image_tag}"]
-    # The list of args for token substitution
-    substitutions:
-        # The name used to call this substitution
-      - name: "prod"
-        description: "Build arguments for the prod image."
-        # The values to replpace the tokens, as positional arguments
-        values: ["./", "latest"]
-
-      - name: "dev"
-        description: "Build arguments for the dev image."
-        values: [".", "local"]
-
-
   - name: dr
     description: "Run 'help' for the packaged Docker application"
     command: "docker run rox:local"
@@ -72,11 +75,11 @@ tasks:
     command: "cargo watch -c -x test"
     description: "Rerun tests on every file change"
 
-  - name: "clippy_ci"
+  - name: "clippy-ci"
     description: "Run Clippy with a non-zero exit if warnings are found."
     command: "cargo clippy -- -D warnings"
 
-  - name: clippy_fix
+  - name: clippy-fix
     command: "cargo clippy"
 
   - name: test
@@ -91,21 +94,17 @@ tasks:
 
   - name: precommit
     description: "All things to run before a commit"
-    pre_tasks: ["clippy_ci", "test"] # It is valid to have no command if there are pre/post tasks instead
 
   # Release-related
-  - name: build_all
-    description: "Build a release artifact binary and Docker image"
-    pre_tasks: ["build_release_binary", "build_release_image"]
-
-  - name: build_release_binary
+  - name: build-release-binary
     description: "Build a release binary with cargo."
     command: "cargo build --release"
 
-  - name: build_release_image
+  - name: build-release-image
     description: "Build a production image for Docker."
     command: "docker build . -t rox:latest"
 
+  # This won't show up in the CLI help output
   - name: invalid
     description: "This task will throw an error becasue it has nothing to do!"
     hide: true

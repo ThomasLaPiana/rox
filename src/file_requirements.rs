@@ -1,4 +1,4 @@
-use crate::roxfile::FileRequirement;
+use crate::models::FileRequirement;
 use crate::utils;
 use std::fs::File;
 
