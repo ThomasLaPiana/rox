@@ -21,7 +21,7 @@ pub fn cli_builder() -> Command {
 /// Build Commands to add to the CLI
 
 /// Build the `task` subcommand with individual tasks nested as subcommands
-pub fn build_task_subcommands(tasks: &Vec<Task>) -> Command {
+pub fn build_task_subcommands(tasks: &[Task]) -> Command {
     let subcommands: Vec<Command> = tasks
         .iter()
         .filter(|target| !target.hide.unwrap_or_default())
@@ -31,11 +31,12 @@ pub fn build_task_subcommands(tasks: &Vec<Task>) -> Command {
     Command::new("task")
         .about("Single executable tasks.")
         .long_about("Discrete units of execution containing a single runnable command.")
+        .arg_required_else_help(true)
         .subcommands(subcommands)
 }
 
 /// Build the `pipelines` subcommand with individual pipelines as subcommands
-pub fn build_pipeline_subcommands(pipelines: &Vec<Pipeline>) -> Command {
+pub fn build_pipeline_subcommands(pipelines: &[Pipeline]) -> Command {
     let subcommands: Vec<Command> = pipelines
         .iter()
         .map(|pipeline| {
@@ -46,5 +47,14 @@ pub fn build_pipeline_subcommands(pipelines: &Vec<Pipeline>) -> Command {
     Command::new("pl")
         .about("Executable pipelines.")
         .long_about("A group of tasks composed into an executable pipeline.")
+        .arg_required_else_help(true)
+        .arg(
+            Arg::new("parallel")
+                .long("parallel")
+                .short('p')
+                .required(false)
+                .action(ArgAction::SetTrue)
+                .help("Run the pipeline tasks in parallel."),
+        )
         .subcommands(subcommands)
 }

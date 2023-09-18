@@ -87,11 +87,7 @@ pipelines:
 
 ## Upcoming Features
 
-- [x] Enforce Version Requirements (by doing semver-style version comparison)
-- [x] Enforce that certain files exist (i.e. a `.env` file)
-- [x] Show elapsed time all commands
-- [x] Command dependencies (pre/post targets)
-- [x] Supports Parallelization of Task Execution
+- [ ] Supports Parallelization of Task Execution for Pipelines
 - [ ] Command Templates
 - [ ] Supports Monorepos via `workdir` specification
 - [ ] Multiple Platform Builds

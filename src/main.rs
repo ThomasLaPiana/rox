@@ -1,10 +1,12 @@
+mod execution;
 mod file_requirements;
 mod models;
-mod task_runner;
 mod utils;
 mod version_requirements;
 use std::collections::HashMap;
 use utils::{color_print, ColorEnum};
+
+use crate::execution::execute_tasks;
 mod cli;
 mod output;
 
@@ -27,9 +29,10 @@ pub fn main() {
         .tasks
         .clone()
         .into_iter()
-        .map(|mut task| {
-            task.file_path = Some(file_path.clone());
-            task
+        .map(|task| {
+            let mut new_task = task.clone();
+            new_task.file_path = Some(file_path.clone());
+            new_task
         })
         .collect();
     sorted_tasks.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
@@ -37,13 +40,14 @@ pub fn main() {
     cli = cli.subcommands(vec![task_subcommands]);
 
     // Build, Sort and add Pipelines
-    if let Some(pipelines) = roxfile.pipelines {
+    if let Some(pipelines) = roxfile.pipelines.clone() {
         let mut sorted_pipelines: Vec<models::Pipeline> = pipelines
             .clone()
             .into_iter()
-            .map(|mut pipeline| {
-                pipeline.file_path = Some(file_path.clone());
-                pipeline
+            .map(|pipeline| {
+                let mut new_pipeline = pipeline.clone();
+                new_pipeline.file_path = Some(file_path.clone());
+                new_pipeline
             })
             .collect();
         sorted_pipelines.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
@@ -74,17 +78,42 @@ pub fn main() {
     }
 
     // Build a HashMap of the task names and their objects
-    // let task_map: HashMap<String, models::Task> = std::collections::HashMap::from_iter(
-    //     tasks.into_iter().map(|task| (task.name.clone(), task)),
-    // );
+    let task_map: HashMap<String, models::Task> = std::collections::HashMap::from_iter(
+        roxfile
+            .tasks
+            .into_iter()
+            .map(|task| (task.name.clone(), task)),
+    );
 
     // Execute the Tasks
-    // let parallel = cli_matches.get_flag("parallel");
-    // let task_stuff = task_map
-    //     .get(cli_matches.subcommand_name().unwrap())
-    //     .unwrap();
-    // let results = task_runner::execute_tasks(task_stuff.to_owned(), &task_map, parallel);
-    // output::display_execution_results(results);
+    let results = match cli_matches.subcommand_name().unwrap() {
+        "pl" => {
+            // Build a HashMap of the pipeline names and their objects to use for lookup
+            let pipeline_map: HashMap<String, models::Pipeline> =
+                std::collections::HashMap::from_iter(
+                    roxfile
+                        .pipelines
+                        .unwrap()
+                        .into_iter()
+                        .map(|pipeline| (pipeline.name.clone(), pipeline)),
+                );
+            // Deconstruct the CLI commands and get the Pipeline object that was called
+            let (_, args) = cli_matches.subcommand().unwrap();
+            let pipeline_name = args.subcommand_name().unwrap();
+            execute_tasks(
+                pipeline_map.get(pipeline_name).unwrap().tasks.clone(),
+                &task_map,
+                false,
+            )
+        }
+        "task" => {
+            let (_, args) = cli_matches.subcommand().unwrap();
+            let task_name = args.subcommand_name().unwrap().to_owned();
+            execute_tasks(vec![task_name], &task_map, false)
+        }
+        &_ => std::process::abort(),
+    };
+    output::display_execution_results(results);
 
     println!("> Total elapsed time: {}s", start.elapsed().as_secs());
 }

@@ -35,7 +35,7 @@ templates:
 pipelines:
   - name: build-all
     description: "Build a release artifact binary and Docker image"
-    tasks: ["build_release_binary", "build_release_image"]
+    tasks: ["build-release-binary", "build-release-image"]
 
 
 tasks:
