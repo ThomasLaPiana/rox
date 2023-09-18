@@ -100,10 +100,11 @@ pub fn main() {
             // Deconstruct the CLI commands and get the Pipeline object that was called
             let (_, args) = cli_matches.subcommand().unwrap();
             let pipeline_name = args.subcommand_name().unwrap();
+            let parallel = args.get_flag("parallel");
             execute_tasks(
                 pipeline_map.get(pipeline_name).unwrap().tasks.clone(),
                 &task_map,
-                false,
+                parallel,
             )
         }
         "task" => {
