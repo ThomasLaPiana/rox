@@ -85,7 +85,7 @@ pub fn main() {
             .map(|task| (task.name.clone(), task)),
     );
 
-    // Execute the Tasks
+    // Execute the Task(s)
     let results = match cli_matches.subcommand_name().unwrap() {
         "pl" => {
             // Build a HashMap of the pipeline names and their objects to use for lookup
