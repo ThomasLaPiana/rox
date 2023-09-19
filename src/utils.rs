@@ -8,6 +8,7 @@ pub enum ColorEnum {
     Red,
 }
 
+/// Print a string as a certain color
 pub fn color_print<T>(outputs: Vec<T>, color: ColorEnum)
 where
     T: Display + Into<String>,
@@ -22,10 +23,12 @@ where
     }
 }
 
+/// A reusable println! to serve as a visual break
 pub fn horizontal_rule() {
     println!("-------------------------------------------");
 }
 
+/// Split a string on spaces and return the head + the remainder
 pub fn split_head_from_rest(snek: &str) -> (String, Vec<String>) {
     let mut split_snek = snek.split(' ');
     let head: String = split_snek.next().unwrap().to_owned();

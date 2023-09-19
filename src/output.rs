@@ -31,7 +31,7 @@ pub fn display_execution_results(results: Vec<TaskResult>) {
         table
             .table()
             .title(vec![
-                "Name".yellow().cell().bold(true),
+                "Task".yellow().cell().bold(true),
                 "Result".yellow().cell().bold(true),
                 "Elapsed Time(s)".yellow().cell().bold(true),
                 "File Path".yellow().cell().bold(true),

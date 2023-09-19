@@ -37,6 +37,9 @@ pipelines:
     description: "Build a release artifact binary and Docker image"
     tasks: ["build-release-binary", "build-release-image"]
 
+  - name: ci
+    description: "Run all CI-related tasks"
+    tasks: ["fmt", "test", "clippy-ci"]
 
 tasks:
 
@@ -82,11 +85,12 @@ tasks:
   - name: clippy-fix
     command: "cargo clippy"
 
+  - name: fmt
+    command: "cargo fmt"
+
   - name: test
     command: "cargo test"
     description: "Run tests"
-    pre_tasks: ["run"]
-    post_tasks: ["clippy_ci"]
 
   - name: run
     description: "Runs the 'help' command as a basic test"

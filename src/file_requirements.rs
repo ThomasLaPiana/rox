@@ -3,7 +3,6 @@ use crate::utils;
 use std::fs::File;
 
 pub fn check_file_exists(path: &str) -> bool {
-    println!("> Checking for file at path: {}", path);
     std::path::Path::new(path).exists()
 }
 
@@ -18,18 +17,10 @@ pub fn handle_file_requirement(requirement: FileRequirement) {
         );
     } else if !result {
         utils::color_print(
-            vec![
-                "File: ".to_string(),
-                requirement.path.to_owned(),
-                " does not exist!".to_string(),
-            ],
+            vec!["File: ", &requirement.path, " does not exist!"],
             utils::ColorEnum::Red,
         );
-    } else {
-        utils::color_print(
-            vec!["File Check succeeded!".to_string()],
-            utils::ColorEnum::Green,
-        );
+        std::process::abort()
     }
 }
 

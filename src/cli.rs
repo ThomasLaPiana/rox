@@ -18,8 +18,6 @@ pub fn cli_builder() -> Command {
         )
 }
 
-/// Build Commands to add to the CLI
-
 /// Build the `task` subcommand with individual tasks nested as subcommands
 pub fn build_task_subcommands(tasks: &[Task]) -> Command {
     let subcommands: Vec<Command> = tasks
@@ -29,7 +27,7 @@ pub fn build_task_subcommands(tasks: &[Task]) -> Command {
         .collect();
 
     Command::new("task")
-        .about("Single executable tasks.")
+        .about("Discrete executable tasks.")
         .long_about("Discrete units of execution containing a single runnable command.")
         .arg_required_else_help(true)
         .subcommands(subcommands)
@@ -45,7 +43,7 @@ pub fn build_pipeline_subcommands(pipelines: &[Pipeline]) -> Command {
         .collect();
 
     Command::new("pl")
-        .about("Executable pipelines.")
+        .about("Tasks composed into pipelines.")
         .long_about("A group of tasks composed into an executable pipeline.")
         .arg_required_else_help(true)
         .arg(

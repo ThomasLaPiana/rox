@@ -40,7 +40,6 @@ pub fn get_result_passfail(result: Result<ExitStatus, std::io::Error>) -> PassFa
 /// Run a Task
 pub fn run_task(task: &Task) -> TaskResult {
     let start = std::time::Instant::now();
-    println!("> Running task: {}", task.name);
 
     let (command, args) = utils::split_head_from_rest(task.command.as_ref().unwrap());
     let command_results = Command::new(command).args(args).status();
@@ -68,6 +67,13 @@ pub fn execute_tasks(
                 .to_owned()
         })
         .collect();
+    println!(
+        "> Running task(s): {:#?}",
+        &task_stack
+            .iter()
+            .map(|task| &task.name)
+            .collect::<Vec<&String>>()
+    );
 
     if parallel {
         return task_stack.par_iter().map(run_task).collect();

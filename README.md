@@ -87,8 +87,8 @@ pipelines:
 
 ## Upcoming Features
 
-- [ ] Supports Parallelization of Task Execution for Pipelines
 - [ ] Command Templates
 - [ ] Supports Monorepos via `workdir` specification
 - [ ] Multiple Platform Builds
 - [ ] Support Definitions in Multiple Files
+- [ ] Thorough Testing  
