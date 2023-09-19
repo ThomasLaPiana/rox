@@ -48,7 +48,7 @@ pub fn run_task(task: &Task) -> TaskResult {
         name: task.name.to_string(),
         result: get_result_passfail(command_results),
         elapsed_time: start.elapsed().as_secs(),
-        file_path: task.file_path.clone().unwrap_or("roxfile.yml".to_owned()),
+        file_path: task.file_path.clone().unwrap(),
     }
 }
 

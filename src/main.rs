@@ -49,8 +49,8 @@ pub fn main() {
     // Build the CLI, including the various dynamically generated subcommands
     let mut cli = cli::cli_builder();
 
-    let task_subcommands =
-        cli::build_task_subcommands(&inject_task_metadata(roxfile.tasks.clone(), &file_path));
+    let tasks = inject_task_metadata(roxfile.tasks, &file_path);
+    let task_subcommands = cli::build_task_subcommands(&tasks);
     cli = cli.subcommands(vec![task_subcommands]);
 
     if let Some(pipelines) = roxfile.pipelines.clone() {
@@ -79,10 +79,7 @@ pub fn main() {
 
     // Build a HashMap of the task names and their objects
     let task_map: HashMap<String, models::Task> = std::collections::HashMap::from_iter(
-        roxfile
-            .tasks
-            .into_iter()
-            .map(|task| (task.name.clone(), task)),
+        tasks.into_iter().map(|task| (task.name.clone(), task)),
     );
 
     // Execute the Task(s)

@@ -87,8 +87,8 @@ pipelines:
 
 ## Upcoming Features
 
-- [ ] Command Templates
-- [ ] Supports Monorepos via `workdir` specification
-- [ ] Multiple Platform Builds
-- [ ] Support Definitions in Multiple Files
-- [ ] Thorough Testing  
+- Task Command Templates
+- Supports Monorepos via `workdir` specification
+- Multiple Platform Builds
+- Support Definitions in Multiple Files
+- Thorough Testing  
