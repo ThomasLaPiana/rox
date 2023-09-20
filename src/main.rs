@@ -25,6 +25,12 @@ fn inject_pipeline_metadata(
     sorted_pipelines
 }
 
+/// Get used Template's information and inject set values
+fn inject_template_value(task: models::Task, template: models::Template) {
+    todo!()
+}
+
+/// Inject additional metadata into each Task and sort based on name.
 fn inject_task_metadata(tasks: Vec<models::Task>, file_path: &str) -> Vec<models::Task> {
     let mut sorted_tasks: Vec<models::Task> = tasks
         .into_iter()
@@ -111,6 +117,7 @@ pub fn main() {
         }
         &_ => std::process::abort(),
     };
+    // TODO: Should it non-zero exit if any task fails?
     output::display_execution_results(results);
 
     println!("> Total elapsed time: {}s", start.elapsed().as_secs());

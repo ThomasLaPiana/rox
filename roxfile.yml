@@ -1,4 +1,3 @@
-# This is an ideal end-state for functionality
 
 # Other files can be combined, but watch out for overwriting identical task names!
 # Not yet implemented
@@ -91,6 +90,10 @@ tasks:
   - name: test
     command: "cargo test"
     description: "Run tests"
+
+  - name: build-binary
+    command: "cargo build"
+    description: "Build the dev binary"
 
   - name: run
     description: "Runs the 'help' command as a basic test"
