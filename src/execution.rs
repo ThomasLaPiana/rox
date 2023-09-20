@@ -1,9 +1,10 @@
 //! This is the module responsible for executing tasks.
 use crate::models::Task;
 use crate::utils;
-use rayon::prelude::*;
 use std::collections::HashMap;
 use std::process::{Command, ExitStatus};
+
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 #[derive(PartialEq, Debug)]
 pub enum PassFail {
@@ -75,6 +76,7 @@ pub fn execute_tasks(
             .collect::<Vec<&String>>()
     );
 
+    // TODO: Add progress bars?
     if parallel {
         return task_stack.par_iter().map(run_task).collect();
     } else {

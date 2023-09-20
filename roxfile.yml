@@ -32,7 +32,7 @@ templates:
     symbols: ["{path}", "{image_tag}"]
 
 pipelines:
-  - name: build-all
+  - name: build-all-release
     description: "Build a release artifact binary and Docker image"
     tasks: ["build-release-binary", "build-release-image"]
 
@@ -50,6 +50,9 @@ tasks:
     description: "Run various cargo subcommands/tools"
     workdir: "/src" # Specify a workdir for the command, which makes it easier to use with Monorepos
 
+  #--------------------------------------------------------
+  # This section is for _already_ implemented functionality
+  #--------------------------------------------------------
   - name: build-local
     description: "Build the application dockerfile"
     uses: docker_build
@@ -60,10 +63,6 @@ tasks:
     uses: docker_build
     values: [".", "latest"]
 
-
-  #--------------------------------------------------------
-  # This section is for _already_ implemented functionality
-  #--------------------------------------------------------
   - name: dr
     description: "Run 'help' for the packaged Docker application"
     command: "docker run rox:local"

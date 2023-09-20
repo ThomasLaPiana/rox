@@ -2,16 +2,6 @@
 //! as well as the validation logic.
 use serde::Deserialize;
 
-/// Load a file into a String
-pub fn load_file(file_path: &str) -> String {
-    std::fs::read_to_string(file_path).expect("Failed to read the Roxfile!")
-}
-
-/// Parse a Roxfile into Rust structs
-pub fn parse_file_contents(contents: String) -> RoxFile {
-    serde_yaml::from_str(&contents).expect("Failed to parse the Roxfile!")
-}
-
 /// Schema for Version Requirement Checks
 ///
 /// Runs the specified commands and checks that
