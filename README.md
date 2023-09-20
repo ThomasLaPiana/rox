@@ -11,6 +11,17 @@ The subcommands and their help messages are automatically populated at runtime f
 
 See the [roxfile.yml](roxfile.yml) for an idea of the planned end-state of syntax and functionality! This is also the Roxfile used for this repo.
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Roxfile Syntax](#roxfile-syntax)
+  - [Version Requirements](#version-requirements)
+  - [File Requirements](#file-requirements)
+  - [Templates](#templates)
+  - [Tasks](#tasks)
+  - [Pipelines](#pipelines)
+- [Putting it all Together](#putting-it-all-together)
+
 ## Installation
 
 Until a proper release pipeline is set up, you'll need `cargo` to get things up and running. Once you've got that installed, clone this repo and run `cargo build`.
