@@ -42,6 +42,7 @@ pub fn get_result_passfail(result: Result<ExitStatus, std::io::Error>) -> PassFa
 pub fn run_task(task: &Task) -> TaskResult {
     let start = std::time::Instant::now();
 
+    println!("> Running command: '{}'", task.command.as_ref().unwrap());
     let (command, args) = utils::split_head_from_rest(task.command.as_ref().unwrap());
     let command_results = Command::new(command).args(args).status();
 
