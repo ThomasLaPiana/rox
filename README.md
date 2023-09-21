@@ -164,8 +164,7 @@ tasks:
 
 ## Upcoming Features
 
-- Task Command Templates
-- Supports Monorepos via `workdir` specification
 - Multiple Platform Builds
+- Supports Monorepos via `workdir` specification
 - Support Definitions in Multiple Files
 - Thorough Testing  
