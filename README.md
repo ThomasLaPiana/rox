@@ -167,7 +167,7 @@ tasks:
 - Multiple Platform Builds
 - Supports Monorepos via `workdir` specification
 - Support Definitions in Multiple Files
-- Thorough Testing  
+- Thorough Testing (using [nextest](https://nexte.st/))
 
 ## Releasing
 
