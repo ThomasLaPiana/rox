@@ -24,7 +24,7 @@ jobs:
           cargo install cargo-audit
 
       - name: Build
-        run: cargo build --release
+        run: cargo build
 
       - name: Format
         run: cargo fmt --check

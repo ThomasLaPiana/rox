@@ -168,3 +168,7 @@ tasks:
 - Supports Monorepos via `workdir` specification
 - Support Definitions in Multiple Files
 - Thorough Testing  
+
+## Releasing
+
+This project utilizes [cargo-release](https://github.com/crate-ci/cargo-release) to manage releases.
