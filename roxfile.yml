@@ -32,7 +32,7 @@ templates:
     symbols: ["{path}", "{image_tag}"]
 
 pipelines:
-  - name: build-all-release
+  - name: build-release-all
     description: "Build a release artifact binary and Docker image"
     tasks: ["build-release-binary", "build-release-image"]
 
@@ -41,11 +41,6 @@ pipelines:
     tasks: ["fmt", "test", "clippy-ci"]
 
 tasks:
-
-  - name: ls
-    command: "dir"
-    description: "Demonstrates running things in a separate dir."
-    workdir: "src/"
 
   - name: build-local
     description: "Build the application dockerfile"
@@ -83,6 +78,10 @@ tasks:
   - name: test
     command: "cargo test"
     description: "Run tests"
+
+  - name: test-workdir
+    command: "docker build ."
+    workdir: "tests/expected/"
 
   - name: build-binary
     command: "cargo build"

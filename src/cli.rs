@@ -43,8 +43,7 @@ pub fn build_pipeline_subcommands(pipelines: &[Pipeline]) -> Command {
         .collect();
 
     Command::new("pl")
-        .about("Tasks composed into pipelines.")
-        .long_about("A group of tasks composed into an executable pipeline.")
+        .about("Pipelines composed of multiple tasks.")
         .arg_required_else_help(true)
         .arg(
             Arg::new("parallel")
@@ -52,7 +51,7 @@ pub fn build_pipeline_subcommands(pipelines: &[Pipeline]) -> Command {
                 .short('p')
                 .required(false)
                 .action(ArgAction::SetTrue)
-                .help("Run the pipeline tasks in parallel."),
+                .help("Run the pipeline's tasks in parallel."),
         )
         .subcommands(subcommands)
 }

@@ -1,18 +1,51 @@
 name: Release Rox
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "*"
 
+env:
+  CLICOLOR_FORCE: 1
 jobs:
-  publish_to_crates:
-    runs-on: ubuntu-latest
+  build:
+    name: Publish for ${{ matrix.binary_target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            binary_target: x86_64-unknown-linux-musl
+          - os: ubuntu-latest
+            binary_target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            binary_target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            binary_target: x86_64-apple-darwin
+          - os: macos-latest
+            binary_target: aarch64-apple-darwin
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Dependencies
+      - name: Install musl tools
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install musl-tools
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Update rust
         run: |
-          cargo install cargo-release
-
-      - name: Publish
-        run: cargo release ${{ github.event.release.tag_name }}
+          rustup override set stable
+          rustup update stable
+          rustup target add ${{ matrix.binary_target }}
+      - name: Build Binary
+        uses: actions-rs/cargo@v1
+        with:
+          command: run
+          args: --bin cargo-make --target-dir target_ci -- make --env CARGO_MAKE_RELEASE_FLOW_TARGET=${{ matrix.binary_target }} zip-release-ci-flow
+      - name: Upload Binaries
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "*.zip"
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true

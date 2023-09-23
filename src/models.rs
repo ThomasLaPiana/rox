@@ -28,6 +28,10 @@ pub struct FileRequirement {
     pub create_if_not_exists: Option<bool>,
 }
 
+pub trait Validate {
+    fn validate(&self);
+}
+
 /// Schema for Tasks in the Roxfile
 ///
 /// Tasks are discrete units of execution

@@ -162,11 +162,37 @@ tasks:
 
 ```
 
-## Upcoming Features
+## Usage
 
-- Supports Monorepos via `workdir` specification
-- Support Definitions in Multiple Files
-- Thorough Testing (using [nextest](https://nexte.st/))
+The following are command-line examples for running `rox` with various flags and subcommands.
+
+### Show Tasks/Pipelines
+
+```sh
+rox task
+```
+
+```sh
+rox pl
+```
+
+### Run a task
+
+```sh
+rox task build-binary
+```
+
+### Run a Pipeline
+
+```sh
+rox pl ci
+```
+
+### Run a Pipeline in Parallel
+
+```sh
+rox pl -p build-release-all
+```
 
 ## Releasing
 
@@ -174,7 +200,9 @@ tasks:
 
 Steps to Release:
 
+1. Make sure that all desired changes are pushed up and merged to `main`
 1. `cargo install cargo-release` (if not already installed)
-2. `cargo release [major|minor|patch] --execute` - Updates the `Cargo.toml`, commits and pushes the change, and then publishes the crate to <crates.io>
-3. `cargo release tag --execute` - Creates a git tag with the same version as the `Cargo.toml`
-4. `cargo release push --execute` - Pushes the git tag
+1. `cargo release [major|minor|patch] --execute` - Updates the `Cargo.toml`, commits and pushes the change, and then publishes the crate to <crates.io>
+1. `cargo release tag --execute` - Creates a git tag with the same version as the `Cargo.toml`
+1. `cargo release push --execute` - Pushes the git tag
+1. Finally, a CI job is automatically triggered to build and upload the release assets
