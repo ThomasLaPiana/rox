@@ -23,9 +23,7 @@ The subcommands and their help messages are automatically populated at runtime f
 
 ## Installation
 
-Currently, `rox` can only be installed via `cargo`.  Install [Rust](https://www.rust-lang.org/tools/install) to get the entire `Rust` toolkit, including `cargo`.
-
-Once that's done, run `cargo install rox` and then `rox --version` to verify that the installation succeeded.
+Rox can be installed via binaries provided with each release [here](https://github.com/ThomasLaPiana/rox/releases). As an alternative, it can also be installed via `cargo` with `cargo install rox-cli`.
 
 ## Roxfile Syntax
 
