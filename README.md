@@ -5,11 +5,9 @@
 
 Composable build tool inspired by [Nox](https://nox.thea.codes/en/stable/), Make & [cargo-make](https://github.com/sagiegurari/cargo-make)
 
-Rox gives you the ability to build your own devtools CLI using YAML files. Tasks and Pipelines are dynamically added to the CLI at runtime. It has fast startup times and full cross-platform compabitility. Being both performant and flexible makes it easier for dev teams to standardize their workflows without writing endless "glue" scripts.
+Rox gives you the ability to build your own devtools CLI using YAML files. Tasks and Pipelines are dynamically added to the CLI as subcommands at runtime. The flexibility of `rox` intends to makes it easier for dev teams to standardize their workflows without writing endless "glue" scripts.
 
-The subcommands and their help messages are automatically populated at runtime from the `name` and `description` of each `target`.
-
-See the [roxfile.yml](roxfile.yml) for an idea of the planned end-state of syntax and functionality! This is also the Roxfile used for this repo.
+The subcommands and their help messages are automatically populated at runtime from the `name` and `description` of each `task`.
 
 ## Table of Contents
 
