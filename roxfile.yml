@@ -42,17 +42,11 @@ pipelines:
 
 tasks:
 
-  #------------------------------------------------
-  # This section is for unimplemented functionality
-  #------------------------------------------------
-  - name: cargo
-    command: "cargo $foo"
-    description: "Run various cargo subcommands/tools"
-    workdir: "/src" # Specify a workdir for the command, which makes it easier to use with Monorepos
+  - name: ls
+    command: "dir"
+    description: "Demonstrates running things in a separate dir."
+    workdir: "src/"
 
-  #--------------------------------------------------------
-  # This section is for _already_ implemented functionality
-  #--------------------------------------------------------
   - name: build-local
     description: "Build the application dockerfile"
     uses: docker_build

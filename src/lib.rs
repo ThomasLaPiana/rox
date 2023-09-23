@@ -56,6 +56,7 @@ fn inject_template_values_valid() {
         values: Some(vec!["1".to_owned(), "2".to_owned()]),
         description: None,
         hide: None,
+        workdir: None,
     };
     let test_template = models::Template {
         name: "Test".to_string(),

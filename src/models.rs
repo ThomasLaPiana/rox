@@ -2,6 +2,8 @@
 //! as well as the validation logic.
 use serde::Deserialize;
 
+// TODO: Add broad validation to each struct
+
 /// Schema for Version Requirement Checks
 ///
 /// Runs the specified commands and checks that
@@ -39,6 +41,7 @@ pub struct Task {
     pub uses: Option<String>,
     pub values: Option<Vec<String>>,
     pub hide: Option<bool>,
+    pub workdir: Option<String>,
 }
 
 /// Schema for Templates

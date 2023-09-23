@@ -1,0 +1,18 @@
+name: Release Rox
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish_to_crates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          cargo install cargo-release
+
+      - name: Publish
+        run: cargo release ${{ github.event.release.tag_name }}
