@@ -1,51 +1,47 @@
-name: Release Rox
+name: Release
+
+permissions:
+  contents: write
 
 on:
   push:
     tags:
-      - "*"
+      - v[0-9]+.*
 
-env:
-  CLICOLOR_FORCE: 1
 jobs:
-  build:
-    name: Publish for ${{ matrix.binary_target }}
-    runs-on: ${{ matrix.os }}
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          # (required) GitHub token for creating GitHub Releases.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-assets:
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            binary_target: x86_64-unknown-linux-musl
-          - os: ubuntu-latest
-            binary_target: x86_64-unknown-linux-gnu
-          - os: windows-latest
-            binary_target: x86_64-pc-windows-msvc
-          - os: macos-latest
-            binary_target: x86_64-apple-darwin
-          - os: macos-latest
-            binary_target: aarch64-apple-darwin
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          # Universal macOS binary is supported as universal-apple-darwin.
+          - target: universal-apple-darwin
+            os: macos-latest
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Install musl tools
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get install musl-tools
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Update rust
-        run: |
-          rustup override set stable
-          rustup update stable
-          rustup target add ${{ matrix.binary_target }}
-      - name: Build Binary
-        uses: actions-rs/cargo@v1
+      - uses: actions/checkout@v4
+      - uses: taiki-e/upload-rust-binary-action@v1
         with:
-          command: run
-          args: --bin cargo-make --target-dir target_ci -- make --env CARGO_MAKE_RELEASE_FLOW_TARGET=${{ matrix.binary_target }} zip-release-ci-flow
-      - name: Upload Binaries
-        uses: svenstaro/upload-release-action@v1-release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "*.zip"
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+          # (required) Comma-separated list of binary names (non-extension portion of filename) to build and upload.
+          # Note that glob pattern is not supported yet.
+          bin: rox
+          # (optional) Target triple, default is host triple.
+          target: ${{ matrix.target }}
+          # (required) GitHub token for uploading assets to GitHub Releases.
+          token: ${{ secrets.GITHUB_TOKEN }}
