@@ -175,4 +175,6 @@ tasks:
 Steps to Release:
 
 1. `cargo install cargo-release` (if not already installed)
-2. `cargo release [major|minor|patch] --execute`
+2. `cargo release [major|minor|patch] --execute` - Updates the `Cargo.toml`, commits and pushes the change, and then publishes the crate to <crates.io>
+3. `cargo release tag --execute` - Creates a git tag with the same version as the `Cargo.toml`
+4. `cargo release push --execute` - Pushes the git tag
