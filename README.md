@@ -87,7 +87,7 @@ tasks:
 
 ### Pipelines
 
-Pipelines are the canonical way to chain together multiple tasks into a single execution unit. They also support parallel execution but it is up to the user to ensure that the tasks can be safely executed in parallel.
+Pipelines are the canonical way to chain together multiple tasks into a single unit of execution. They also support parallel execution with the `-p` flag but it is up to the user to ensure that the tasks can be safely executed in parallel.
 
 ```yaml
 pipelines: 
@@ -157,7 +157,7 @@ tasks:
     command: "docker build . -t rox:latest"
 
   - name: secret_task
-    description: "This task isn't callable directly from the CLI!"
+    description: "This task isn't callable directly from the CLI, but is available to pipelines!"
     hide: true
 
 ```
@@ -176,17 +176,29 @@ rox task
 rox pl
 ```
 
-### Run a task
+
+https://github.com/ThomasLaPiana/rox/assets/5105354/2041522d-4cb2-4c96-9655-c1802fdf16c8
+
+
+### Run a Task
 
 ```sh
 rox task build-binary
 ```
+
+
+https://github.com/ThomasLaPiana/rox/assets/5105354/9f152b3b-8a65-4409-af5c-da029c3e8ae4
+
 
 ### Run a Pipeline
 
 ```sh
 rox pl ci
 ```
+
+
+https://github.com/ThomasLaPiana/rox/assets/5105354/02d99bc6-0dc1-4c33-a753-2868043c4d43
+
 
 ### Run a Pipeline in Parallel
 
