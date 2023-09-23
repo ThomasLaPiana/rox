@@ -24,9 +24,9 @@ See the [roxfile.yml](roxfile.yml) for an idea of the planned end-state of synta
 
 ## Installation
 
-Until a proper release pipeline is set up, you'll need `cargo` to get things up and running. Once you've got that installed, clone this repo and run `cargo build`.
+Currently, `rox` can only be installed via `cargo`.  Install [Rust](https://www.rust-lang.org/tools/install) to get the entire `Rust` toolkit, including `cargo`.
 
-To play around further, you can either run `cargo run help` or execute the built binary within the `target/debug/` dir.
+Once that's done, run `cargo install rox` and then `rox --version` to verify that the installation succeeded.
 
 ## Roxfile Syntax
 
@@ -164,11 +164,15 @@ tasks:
 
 ## Upcoming Features
 
-- Multiple Platform Builds
 - Supports Monorepos via `workdir` specification
 - Support Definitions in Multiple Files
 - Thorough Testing (using [nextest](https://nexte.st/))
 
 ## Releasing
 
-This project utilizes [cargo-release](https://github.com/crate-ci/cargo-release) to manage releases.
+`Rox` is released by running `cargo release` locally.
+
+Steps to Release:
+
+1. `cargo install cargo-release` (if not already installed)
+2. `cargo release [major|minor|patch] --execute`
