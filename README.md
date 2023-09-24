@@ -9,6 +9,8 @@ Rox gives you the ability to build your own devtools CLI using YAML files. Tasks
 
 The subcommands and their help messages are automatically populated at runtime from the `name` and `description` of each `task`.
 
+See [gameslog](https://github.com/ThomasLaPiana/gameslog-rs) for an example of usage in a real project.
+
 ## Table of Contents
 
 - [Installation](#installation)
@@ -26,6 +28,8 @@ The subcommands and their help messages are automatically populated at runtime f
 Rox can be installed via binaries provided with each release [here](https://github.com/ThomasLaPiana/rox/releases). As an alternative, it can also be installed via `cargo` with `cargo install rox-cli`.
 
 ## Roxfile Syntax
+
+Rox requires that a `roxfile.yml` exists in the directory where the command is run. This is typically the root directory of the repo.
 
 ### Version Requirements
 
@@ -123,6 +127,7 @@ pipelines:
 
 tasks:
 
+  # Docker-related
   - name: build-local
     description: "Build the application dockerfile"
     uses: docker_build
@@ -133,6 +138,7 @@ tasks:
     uses: docker_build
     values: [".", "latest"]
 
+  # CI-Related
   - name: "clippy-ci"
     description: "Run Clippy with a non-zero exit if warnings are found."
     command: "cargo clippy -- -D warnings"
