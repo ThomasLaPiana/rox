@@ -52,7 +52,7 @@ pub struct Task {
 ///
 /// Templates are injectable commands that
 /// can be used by tasks.
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Debug, Default, Clone)]
 pub struct Template {
     pub name: String,
     pub command: String,
@@ -71,7 +71,7 @@ pub struct Pipeline {
 }
 
 /// The top-level structure of the Roxfile
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Debug, Default, Clone)]
 pub struct RoxFile {
     pub version_requirements: Option<Vec<VersionRequirement>>,
     pub file_requirements: Option<Vec<FileRequirement>>,

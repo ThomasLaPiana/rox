@@ -51,6 +51,7 @@ tasks:
   - name: "wr"
     command: "cargo watch -c -x run"
     description: "Run the application, restarting on file changes"
+    hide: true
 
   - name: "wt"
     command: "cargo watch -c -x test"

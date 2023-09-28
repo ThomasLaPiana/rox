@@ -5,6 +5,8 @@ mod utils;
 mod version_requirements;
 use std::collections::HashMap;
 
+use models::RoxFile;
+
 use crate::execution::{execute_stages, execute_tasks, PassFail, TaskResult};
 mod cli;
 mod output;
@@ -80,29 +82,48 @@ fn inject_task_metadata(tasks: Vec<models::Task>, file_path: &str) -> Vec<models
     sorted_tasks
 }
 
+/// Get the filepath from the CLI
+fn get_filepath() -> String {
+    let cli = cli::cli_builder();
+    // Get the file arg from the CLI if set
+    let cli_matches = cli.clone().arg_required_else_help(false).get_matches();
+    cli_matches.get_one::<String>("roxfile").unwrap().to_owned()
+}
+
+/// Dyanmically construct the CLI from the Roxfile
+fn construct_cli(roxfile: RoxFile, file_path: &str) -> clap::Command {
+    let mut cli = cli::cli_builder();
+
+    // Tasks
+    let task_subcommands = cli::build_task_subcommands(&roxfile.tasks);
+    cli = cli.subcommands(vec![task_subcommands]);
+
+    // Pipelines
+    if let Some(pipelines) = roxfile.pipelines.clone() {
+        let sorted_pipelines = inject_pipeline_metadata(pipelines, file_path);
+        let pipeline_subcommands = cli::build_pipeline_subcommands(&sorted_pipelines);
+        cli = cli.subcommands(vec![pipeline_subcommands]);
+    }
+    cli
+}
+
 // Entrypoint for the Crate CLI
 pub fn rox() -> RoxResult<()> {
     let start = std::time::Instant::now();
 
-    // Load in the Roxfile(s)
-    let file_path = "roxfile.yml".to_string();
+    // NOTE: Due to the dynamically generated nature of the CLI,
+    // It is required to parse the CLI matches twice. Once to get
+    // the filename arg and once to actually build the CLI.
+
+    // Get the file arg from the CLI if set
+    let file_path = get_filepath();
     let roxfile = utils::parse_file_contents(utils::load_file(&file_path));
     utils::horizontal_rule();
 
-    // Build the CLI, including the various dynamically generated subcommands
-    let mut cli = cli::cli_builder();
-
-    let tasks = inject_task_metadata(roxfile.tasks, &file_path);
-    let task_subcommands = cli::build_task_subcommands(&tasks);
-    cli = cli.subcommands(vec![task_subcommands]);
-
-    if let Some(pipelines) = roxfile.pipelines.clone() {
-        let sorted_pipelines = inject_pipeline_metadata(pipelines, &file_path);
-        let pipeline_subcommands = cli::build_pipeline_subcommands(&sorted_pipelines);
-        cli = cli.subcommands(vec![pipeline_subcommands]);
-    }
+    // Build/Generate the CLI based on the loaded Roxfile
+    let tasks = inject_task_metadata(roxfile.tasks.clone(), &file_path);
+    let cli = construct_cli(roxfile.clone(), &file_path);
     let cli_matches = cli.get_matches();
-    println!("{:?}", cli_matches);
 
     // Run File and Version checks
     if !cli_matches.get_flag("skip-checks") {
@@ -169,7 +190,11 @@ pub fn rox() -> RoxResult<()> {
         &_ => std::process::abort(),
     };
     output::display_execution_results(results.clone());
-    println!("> Total elapsed time: {}s", start.elapsed().as_secs());
+    println!(
+        "> Total elapsed time: {}s | {}ms",
+        start.elapsed().as_secs(),
+        start.elapsed().as_millis(),
+    );
     nonzero_exit_if_failure(results);
 
     Ok(())

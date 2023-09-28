@@ -1,0 +1,12 @@
+tasks:
+  - name: "passing"
+    command: "echo test"
+
+pipelines:
+  - name: passing_single
+    stages: [["passing"]]
+
+  - name: passing_multi
+    stages:
+      - ["passing", "passing"]
+      - ["passing"]

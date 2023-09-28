@@ -7,7 +7,7 @@ Composable build tool inspired by [Nox](https://nox.thea.codes/en/stable/), Make
 
 Rox gives you the ability to build your own devtools CLI using YAML files. Tasks and Pipelines are dynamically added to the CLI as subcommands at runtime. The flexibility of `rox` intends to makes it easier for dev teams to standardize their workflows without writing endless "glue" scripts.
 
-The subcommands and their help messages are automatically populated at runtime from the `name` and `description` of each `task`.
+The subcommands and their help messages are automatically populated at runtime from the `name` and `description` of each `task` or `pipeline`.
 
 See [gameslog](https://github.com/ThomasLaPiana/gameslog-rs) for an example of usage in a real project.
 
@@ -29,7 +29,7 @@ Rox can be installed via binaries provided with each release [here](https://gith
 
 ## Roxfile Syntax
 
-Rox requires that a `roxfile.yml` exists in the directory where the command is run. This is typically the root directory of the repo.
+Rox requires a `YAML` file with the correct format and syntax to be parsed into a CLI. This file is expected to be at `./roxfile.yml` by default but that can be overriden with the `-f` flag at runtime.
 
 ### Version Requirements
 
@@ -88,7 +88,7 @@ tasks:
 
 ### Pipelines
 
-Pipelines are the canonical way to chain together multiple tasks into a single unit of execution. Note that `stages` expects a list of lists, which we'll expand upon below.
+Pipelines are the canonical way to chain together multiple tasks into a single unit of execution. Note that `stages` object expects a list of lists, which we'll expand upon below.
 
 ```yaml
 pipelines: 
@@ -106,7 +106,7 @@ In the following example, the parallel execution pattern would look like this:
 1. Tasks `a` is executed
 1. Tasks `b` and `c` are executed, potentially in parallel
 1. Tasks `e` and `d` are executed, potentially in parallel.
-1. Finally, task `f` would be run.
+1. Finally, task `f` is executed.
 
 ```yaml
 pipelines: 
