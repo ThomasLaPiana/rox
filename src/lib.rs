@@ -5,7 +5,7 @@ mod utils;
 mod version_requirements;
 use std::collections::HashMap;
 
-use crate::execution::execute_tasks;
+use crate::execution::{execute_stages, execute_tasks, PassFail, TaskResult};
 mod cli;
 mod output;
 use std::error::Error;
@@ -102,6 +102,7 @@ pub fn rox() -> RoxResult<()> {
         cli = cli.subcommands(vec![pipeline_subcommands]);
     }
     let cli_matches = cli.get_matches();
+    println!("{:?}", cli_matches);
 
     // Run File and Version checks
     if !cli_matches.get_flag("skip-checks") {
@@ -148,14 +149,14 @@ pub fn rox() -> RoxResult<()> {
     );
 
     // Execute the Task(s)
-    let results = match cli_matches.subcommand_name().unwrap() {
+    let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
         "pl" => {
             // Deconstruct the CLI commands and get the Pipeline object that was called
             let (_, args) = cli_matches.subcommand().unwrap();
             let pipeline_name = args.subcommand_name().unwrap();
             let parallel = args.get_flag("parallel");
-            execute_tasks(
-                pipeline_map.get(pipeline_name).unwrap().tasks.clone(),
+            execute_stages(
+                pipeline_map.get(pipeline_name).unwrap().stages.clone(),
                 &task_map,
                 parallel,
             )
@@ -163,13 +164,23 @@ pub fn rox() -> RoxResult<()> {
         "task" => {
             let (_, args) = cli_matches.subcommand().unwrap();
             let task_name = args.subcommand_name().unwrap().to_owned();
-            execute_tasks(vec![task_name], &task_map, false)
+            vec![execute_tasks(vec![task_name], &task_map, false)]
         }
         &_ => std::process::abort(),
     };
-    // TODO: Non-zero exit if any task failed
-    output::display_execution_results(results);
-
+    output::display_execution_results(results.clone());
     println!("> Total elapsed time: {}s", start.elapsed().as_secs());
+    nonzero_exit_if_failure(results);
+
     Ok(())
+}
+
+/// Throw a non-zero exit if any Task(s) had a failing result
+pub fn nonzero_exit_if_failure(results: Vec<Vec<TaskResult>>) {
+    // TODO: Figure out a way to get this info without looping again
+    for result in results.iter().flatten() {
+        if result.result == PassFail::Fail {
+            std::process::exit(2)
+        }
+    }
 }

@@ -7,7 +7,9 @@ pub fn cli_builder() -> Command {
         .about("Rox: The Robust Developer Experience CLI")
         .version(crate_version!())
         .arg_required_else_help(true)
-        // TODO: Add a "watch" flag to run the command on file changes to a path
+        // TODO: Add a "watch" flag to run the command on file changes to a path?
+        // TODO: Add the option to log the command outputs into a file?
+        .arg(Arg::new("roxfile").long("file").short('f').required(false))
         .arg(
             Arg::new("skip-checks")
                 .long("skip-checks")

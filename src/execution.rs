@@ -6,7 +6,7 @@ use std::process::{Command, ExitStatus};
 
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum PassFail {
     Pass,
     Fail,
@@ -17,7 +17,7 @@ impl std::fmt::Display for PassFail {
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct TaskResult {
     pub name: String,
     pub result: PassFail,
@@ -88,4 +88,17 @@ pub fn execute_tasks(
     } else {
         return task_stack.iter().map(run_task).collect();
     }
+}
+
+/// Execute a vector of Stages
+pub fn execute_stages(
+    stages: Vec<Vec<String>>,
+    task_map: &HashMap<String, Task>,
+    parallel: bool,
+) -> Vec<Vec<TaskResult>> {
+    let stage_results: Vec<Vec<TaskResult>> = stages
+        .iter()
+        .map(|stage| execute_tasks(stage.clone(), task_map, parallel))
+        .collect();
+    stage_results
 }

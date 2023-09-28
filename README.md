@@ -88,13 +88,35 @@ tasks:
 
 ### Pipelines
 
-Pipelines are the canonical way to chain together multiple tasks into a single unit of execution. They also support parallel execution with the `-p` flag but it is up to the user to ensure that the tasks can be safely executed in parallel.
+Pipelines are the canonical way to chain together multiple tasks into a single unit of execution. Note that `stages` expects a list of lists, which we'll expand upon below.
 
 ```yaml
 pipelines: 
   - name: example-pipeline
     description: Composes a few tasks
-    tasks: ["task-a", "task-b", "task-c"]
+    stages: [["task-a", "task-b", "task-c"]]
+```
+
+To make execution more efficient, Pipelines support a simple DAG definition syntax that allows `tasks` _within_ the same stage to be executed in parallel. This gives user more fine-grained control over how multiple tasks are executed while still keeping the syntax relatively lightweight. Parallel execution is not used by default, and requires using the `--parallel` or `-p` flag on invocation.
+
+The `stages` field expects a list of lists to facilitate this. Each `stage` is like a small pipeline in and of itself, and each stage's tasks must all finish executing before work starts on the next stage.
+
+In the following example, the parallel execution pattern would look like this:
+
+1. Tasks `a` is executed
+1. Tasks `b` and `c` are executed, potentially in parallel
+1. Tasks `e` and `d` are executed, potentially in parallel.
+1. Finally, task `f` would be run.
+
+```yaml
+pipelines: 
+  - name: example-pipeline
+    description: Composes a few tasks
+    stages:
+      - ["task-a"]
+      - ["task-b", "task-c"]
+      - ["task-e", "task-d"]
+      - ["task-f"]
 ```
 
 ### Putting it all together
@@ -119,11 +141,13 @@ templates:
 pipelines:
   - name: build-all
     description: "Build a release artifact binary and Docker image"
-    tasks: ["build-release-binary", "build-release-image"]
+    tasks: [["build-release-binary", "build-release-image"]]
 
   - name: ci
     description: "Run all CI-related tasks"
-    tasks: ["fmt", "test", "clippy-ci"]
+    tasks: 
+      - ["fmt", "clippy-ci"]
+      - ["test"]
 
 tasks:
 

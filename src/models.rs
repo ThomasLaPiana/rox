@@ -66,7 +66,7 @@ pub struct Template {
 pub struct Pipeline {
     pub name: String,
     pub description: Option<String>,
-    pub tasks: Vec<String>,
+    pub stages: Vec<Vec<String>>,
     pub file_path: Option<String>,
 }
 

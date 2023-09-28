@@ -1,29 +1,14 @@
-
-# Other files can be combined, but watch out for overwriting identical task names!
-# Not yet implemented
-supplemental_files: ["someotherfile.yml"]
-
 # These checks require a single, well-formed SemVer version string as output from the command
 version_requirements:
-  - command: "docker version --format {{.Client.Version}}" # 20.10.23
-    minimum_version: "20.10.7"
-    maximum_version: "21.0.0"
-
   - command: "cargo watch --version"
     minimum_version: "8.1.7"
     split: true
 
-  - command: "python --version" # Python 3.9.13
-    # Splits on spaces and grabs the last output token,
-    # useful for avoiding bash manipulation of output
-    split: true 
-    minimum_version: "3.8"
-
 file_requirements: # Verify that these files exist
   - path: "Cargo.toml"
-  
+
   - path: ".env"
-    create_if_not_exists: true # Create the file if it doesn't exist 
+    create_if_not_exists: true # Create the file if it doesn't exist
 
 # Contains templates for commands that can be used by tasks
 templates:
@@ -34,14 +19,20 @@ templates:
 pipelines:
   - name: build-release-all
     description: "Build a release artifact binary and Docker image"
-    tasks: ["build-release-binary", "build-release-image"]
+    # Execution is parallelized _within_ a single stage.
+    # This gives users more fine-grained control over parallel
+    # execution and functions as a lightweight DAG representation.
+    stages:
+      - ["build-release-binary", "build-release-image"]
 
   - name: ci
     description: "Run all CI-related tasks"
-    tasks: ["fmt", "test", "clippy-ci"]
+    stages:
+      - ["fmt", "clippy-ci"]
+      - ["test"]
+      - ["fmt", "clippy-ci"]
 
 tasks:
-
   - name: build-local
     description: "Build the application dockerfile"
     uses: docker_build
@@ -56,7 +47,7 @@ tasks:
     description: "Run 'help' for the packaged Docker application"
     command: "docker run rox:local"
     pre_tasks: ["db"]
-    
+
   - name: "wr"
     command: "cargo watch -c -x run"
     description: "Run the application, restarting on file changes"
@@ -64,6 +55,10 @@ tasks:
   - name: "wt"
     command: "cargo watch -c -x test"
     description: "Rerun tests on every file change"
+
+  - name: "wc"
+    command: "cargo watch -c -x check"
+    description: "Rerun checks on every file change"
 
   - name: "clippy-ci"
     description: "Run Clippy with a non-zero exit if warnings are found."
