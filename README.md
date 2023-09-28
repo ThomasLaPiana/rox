@@ -141,11 +141,11 @@ templates:
 pipelines:
   - name: build-all
     description: "Build a release artifact binary and Docker image"
-    tasks: [["build-release-binary", "build-release-image"]]
+    stages: [["build-release-binary", "build-release-image"]]
 
   - name: ci
     description: "Run all CI-related tasks"
-    tasks: 
+    stages: 
       - ["fmt", "clippy-ci"]
       - ["test"]
 
