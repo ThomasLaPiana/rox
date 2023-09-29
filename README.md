@@ -121,73 +121,7 @@ pipelines:
 
 ### Putting it all together
 
-Now that we've seen each individual piece of the Rox puzzle, we can put them all together into a full `roxfile`.
-
-```yaml
-version_requirements:
-  - command: "docker version --format {{.Client.Version}}"
-    minimum_version: "20.10.7"
-    maximum_version: "21.0.0"
-
-file_requirements:
-  - path: ".env"
-    create_if_not_exists: true
-
-templates:
-  - name: docker_build
-    command: "docker build {path} -t rox:{image_tag}"
-    symbols: ["{path}", "{image_tag}"]
-
-pipelines:
-  - name: build-all
-    description: "Build a release artifact binary and Docker image"
-    stages: [["build-release-binary", "build-release-image"]]
-
-  - name: ci
-    description: "Run all CI-related tasks"
-    stages: 
-      - ["fmt", "clippy-ci"]
-      - ["test"]
-
-tasks:
-
-  # Docker-related
-  - name: build-local
-    description: "Build the application dockerfile"
-    uses: docker_build
-    values: [".", "local"]
-
-  - name: build-prod
-    description: "Build the application dockerfile"
-    uses: docker_build
-    values: [".", "latest"]
-
-  # CI-Related
-  - name: "clippy-ci"
-    description: "Run Clippy with a non-zero exit if warnings are found."
-    command: "cargo clippy -- -D warnings"
-
-  - name: fmt
-    command: "cargo fmt"
-
-  - name: test
-    command: "cargo test"
-    description: "Run tests"
-
-  # Release-related
-  - name: build-release-binary
-    description: "Build a release binary with cargo."
-    command: "cargo build --release"
-
-  - name: build-release-image
-    description: "Build a production image for Docker."
-    command: "docker build . -t rox:latest"
-
-  - name: secret_task
-    description: "This task isn't callable directly from the CLI, but is available to pipelines!"
-    hide: true
-
-```
+Now that we've seen each individual piece of the Rox puzzle, we can put them all together into a full `roxfile`. See the [example roxfile.yml](roxfile.yml) in this repo for a working example!
 
 ## Usage Examples
 
