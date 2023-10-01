@@ -1,6 +1,13 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
 
+/// Test helper to load the Rox command from bin and set the test file path
+fn test_command() -> Command {
+    let mut cmd = Command::cargo_bin("rox").unwrap();
+    cmd.arg("-f").arg("tests/files/test_roxfile.yml");
+    cmd
+}
+
 #[test]
 fn dies_no_args() {
     let mut cmd = Command::cargo_bin("rox").unwrap();
@@ -11,8 +18,8 @@ fn dies_no_args() {
 
 #[test]
 fn help_succeeds() {
-    let mut cmd = Command::cargo_bin("rox").unwrap();
-    cmd.arg("help")
+    test_command()
+        .arg("help")
         .assert()
         .success()
         .stdout(predicate::str::contains("Usage"));
@@ -20,20 +27,12 @@ fn help_succeeds() {
 
 #[test]
 fn test_task_succeeds() {
-    let mut cmd = Command::cargo_bin("rox").unwrap();
-    cmd.arg("-f")
-        .arg("tests/files/test_roxfile.yml")
-        .arg("task")
-        .arg("passing")
-        .assert()
-        .success();
+    test_command().arg("task").arg("passing").assert().success();
 }
 
 #[test]
 fn test_pipeline_succeeds_single_stage() {
-    let mut cmd = Command::cargo_bin("rox").unwrap();
-    cmd.arg("-f")
-        .arg("tests/files/test_roxfile.yml")
+    test_command()
         .arg("pl")
         .arg("passing_single")
         .assert()
@@ -42,9 +41,7 @@ fn test_pipeline_succeeds_single_stage() {
 
 #[test]
 fn test_pipeline_succeeds_multi_stage() {
-    let mut cmd = Command::cargo_bin("rox").unwrap();
-    cmd.arg("-f")
-        .arg("tests/files/test_roxfile.yml")
+    test_command()
         .arg("pl")
         .arg("passing_multi")
         .assert()
@@ -53,12 +50,44 @@ fn test_pipeline_succeeds_multi_stage() {
 
 #[test]
 fn test_pipeline_succeeds_parallel() {
-    let mut cmd = Command::cargo_bin("rox").unwrap();
-    cmd.arg("-f")
-        .arg("tests/files/test_roxfile.yml")
+    test_command()
         .arg("pl")
         .arg("-p")
         .arg("passing_single")
         .assert()
         .success();
+}
+
+#[test]
+fn test_serial_processing_time() {
+    let expected = "> Total elapsed time: 4s";
+    test_command()
+        .arg("pl")
+        .arg("sleep_multi")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(expected));
+}
+
+#[test]
+fn test_parallel_processing_time() {
+    let expected = "> Total elapsed time: 3s";
+    test_command()
+        .arg("pl")
+        .arg("-p")
+        .arg("sleep_multi")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(expected));
+}
+
+#[test]
+fn test_hidden_task() {
+    let expected = "hidden";
+    test_command()
+        .arg("task")
+        .arg("-h")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(expected).count(0));
 }

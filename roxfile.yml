@@ -41,7 +41,6 @@ tasks:
   - name: dr
     description: "Run 'help' for the packaged Docker application"
     command: "docker run rox:local"
-    pre_tasks: ["db"]
 
   - name: "wr"
     command: "cargo watch -c -x run"

@@ -1,6 +1,13 @@
 tasks:
   - name: "passing"
     command: "echo test"
+  
+  - name: "sleep"
+    command: "sleep 1"
+
+  - name: hidden
+    command: echo hidden
+    hide: true
 
 pipelines:
   - name: passing_single
@@ -10,3 +17,9 @@ pipelines:
     stages:
       - ["passing", "passing"]
       - ["passing"]
+
+  - name: sleep_multi
+    stages:
+      - ["sleep"]
+      - ["sleep", "sleep"]
+      - ["sleep"]

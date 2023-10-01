@@ -10,6 +10,7 @@ use serde::Deserialize;
 /// output is a valid version that falls within
 /// the defined minimum and maximum allowed versions.
 #[derive(Deserialize, Debug, Clone, Default)]
+#[serde(deny_unknown_fields)]
 pub struct VersionRequirement {
     pub command: String,
     pub minimum_version: Option<String>,
@@ -23,6 +24,7 @@ pub struct VersionRequirement {
 /// or can be configured to create the file
 /// if its missing.
 #[derive(Deserialize, Debug, Clone, Default)]
+#[serde(deny_unknown_fields)]
 pub struct FileRequirement {
     pub path: String,
     pub create_if_not_exists: Option<bool>,
@@ -37,6 +39,7 @@ pub trait Validate {
 /// Tasks are discrete units of execution
 /// that send commands to the shell.
 #[derive(Deserialize, Debug, Clone, Default)]
+#[serde(deny_unknown_fields)]
 pub struct Task {
     pub name: String,
     pub command: Option<String>,
@@ -53,6 +56,7 @@ pub struct Task {
 /// Templates are injectable commands that
 /// can be used by tasks.
 #[derive(Deserialize, Debug, Default, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct Template {
     pub name: String,
     pub command: String,
@@ -63,6 +67,7 @@ pub struct Template {
 ///
 /// Pipelines are collections of tasks.
 #[derive(Deserialize, Debug, Clone, Default)]
+#[serde(deny_unknown_fields)]
 pub struct Pipeline {
     pub name: String,
     pub description: Option<String>,
@@ -72,6 +77,7 @@ pub struct Pipeline {
 
 /// The top-level structure of the Roxfile
 #[derive(Deserialize, Debug, Default, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct RoxFile {
     pub version_requirements: Option<Vec<VersionRequirement>>,
     pub file_requirements: Option<Vec<FileRequirement>>,
