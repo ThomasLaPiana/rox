@@ -24,6 +24,7 @@ jobs:
           rustup component add clippy
           cargo install cargo-audit
           cargo install cargo-nextest
+          cargo install cargo-watch
 
       - name: Build
         run: cargo build
