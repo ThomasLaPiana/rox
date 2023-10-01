@@ -3,6 +3,10 @@ version_requirements:
     minimum_version: "8.1.7"
     split: true
 
+  - command: "cargo nextest --version"
+    minimum_version: "0.9.0"
+    split: true
+
 file_requirements:
   - path: "Cargo.toml"
 
@@ -25,28 +29,8 @@ pipelines:
     stages:
       - ["fmt", "clippy-ci"]
       - ["test"]
-      - ["fmt", "clippy-ci"]
 
 tasks:
-  - name: build-local
-    description: "Build the application dockerfile"
-    uses: docker_build
-    values: [".", "local"]
-
-  - name: build-prod
-    description: "Build the application dockerfile"
-    uses: docker_build
-    values: [".", "latest"]
-
-  - name: dr
-    description: "Run 'help' for the packaged Docker application"
-    command: "docker run rox:local"
-
-  - name: "wr"
-    command: "cargo watch -c -x run"
-    description: "Run the application, restarting on file changes"
-    hide: true
-
   - name: "wt"
     command: "cargo watch -c -x test"
     description: "Rerun tests on every file change"
@@ -59,19 +43,12 @@ tasks:
     description: "Run Clippy with a non-zero exit if warnings are found."
     command: "cargo clippy -- -D warnings"
 
-  - name: clippy-fix
-    command: "cargo clippy"
-
   - name: fmt
     command: "cargo fmt"
 
   - name: test
-    command: "cargo test"
+    command: "cargo nextest run"
     description: "Run tests"
-
-  - name: test-workdir
-    command: "docker build ."
-    workdir: "tests/expected/"
 
   - name: build-binary
     command: "cargo build"
@@ -80,9 +57,6 @@ tasks:
   - name: run
     description: "Runs the 'help' command as a basic test"
     command: "cargo run help"
-
-  - name: precommit
-    description: "All things to run before a commit"
 
   # Release-related
   - name: build-release-binary

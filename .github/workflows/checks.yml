@@ -23,18 +23,19 @@ jobs:
           rustup update
           rustup component add clippy
           cargo install cargo-audit
+          cargo install cargo-nextest
 
       - name: Build
         run: cargo build
 
       - name: Format
-        run: cargo fmt --check
+        run: cargo run task fmt
 
       - name: Lint
-        run: cargo clippy -- -D warnings
+        run: cargo run task clippy-ci
 
       - name: Security Audit
         run: cargo audit
 
       - name: Test
-        run: cargo test
+        run: cargo run task test
