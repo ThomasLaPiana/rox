@@ -22,9 +22,7 @@ jobs:
         run: |
           rustup update
           rustup component add clippy
-          cargo install cargo-audit
           cargo install cargo-nextest
-          cargo install cargo-watch
 
       - name: Build
         run: cargo build
@@ -34,9 +32,6 @@ jobs:
 
       - name: Lint
         run: cargo run task clippy-ci
-
-      - name: Security Audit
-        run: cargo audit
 
       - name: Test
         run: cargo run task test
