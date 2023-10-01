@@ -26,12 +26,12 @@ fn help_succeeds() {
 }
 
 #[test]
-fn test_task_succeeds() {
+fn task_succeeds() {
     test_command().arg("task").arg("passing").assert().success();
 }
 
 #[test]
-fn test_pipeline_succeeds_single_stage() {
+fn pipeline_succeeds_single_stage() {
     test_command()
         .arg("pl")
         .arg("passing_single")
@@ -40,7 +40,7 @@ fn test_pipeline_succeeds_single_stage() {
 }
 
 #[test]
-fn test_pipeline_succeeds_multi_stage() {
+fn pipeline_succeeds_multi_stage() {
     test_command()
         .arg("pl")
         .arg("passing_multi")
@@ -49,7 +49,7 @@ fn test_pipeline_succeeds_multi_stage() {
 }
 
 #[test]
-fn test_pipeline_succeeds_parallel() {
+fn pipeline_succeeds_parallel() {
     test_command()
         .arg("pl")
         .arg("-p")
@@ -59,7 +59,7 @@ fn test_pipeline_succeeds_parallel() {
 }
 
 #[test]
-fn test_serial_processing_time() {
+fn serial_processing_time() {
     let expected = "> Total elapsed time: 4s";
     test_command()
         .arg("pl")
@@ -70,7 +70,7 @@ fn test_serial_processing_time() {
 }
 
 #[test]
-fn test_parallel_processing_time() {
+fn parallel_processing_time() {
     let expected = "> Total elapsed time: 3s";
     test_command()
         .arg("pl")
@@ -82,7 +82,7 @@ fn test_parallel_processing_time() {
 }
 
 #[test]
-fn test_hidden_task() {
+fn hidden_task() {
     let expected = "hidden";
     test_command()
         .arg("task")

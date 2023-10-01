@@ -48,7 +48,7 @@ pub fn split_head_from_rest(snek: &str) -> (String, Vec<String>) {
 }
 
 #[test]
-fn test_split_head_valid() {
+fn split_head_valid() {
     assert_eq!(
         (
             "Foo".to_string(),
@@ -59,6 +59,6 @@ fn test_split_head_valid() {
 }
 
 #[test]
-fn test_split_head_single() {
+fn split_head_single() {
     assert_eq!(("Foo".to_string(), vec![]), split_head_from_rest("Foo"));
 }
