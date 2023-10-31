@@ -1,18 +1,22 @@
 use crate::model_injection::inject_pipeline_metadata;
-use crate::models::{Pipeline, RoxFile, Task};
+use crate::models::{Pipeline, Task};
 use clap::{crate_version, Arg, ArgAction, Command};
 
 /// Dyanmically construct the CLI from the Roxfile
-pub fn construct_cli(roxfile: RoxFile, file_path: &str) -> clap::Command {
+pub fn construct_cli(
+    tasks: Vec<Task>,
+    pipelines: Option<Vec<Pipeline>>,
+    file_path: &str,
+) -> clap::Command {
     let mut cli = cli_builder();
 
     // Tasks
-    let task_subcommands = build_task_subcommands(&roxfile.tasks);
+    let task_subcommands = build_task_subcommands(&tasks);
     cli = cli.subcommands(vec![task_subcommands]);
 
     // Pipelines
-    if let Some(pipelines) = roxfile.pipelines {
-        let sorted_pipelines = inject_pipeline_metadata(pipelines, file_path);
+    if pipelines.is_some() {
+        let sorted_pipelines = inject_pipeline_metadata(pipelines.unwrap(), file_path);
         let pipeline_subcommands = build_pipeline_subcommands(&sorted_pipelines);
         cli = cli.subcommands(vec![pipeline_subcommands]);
     }
@@ -71,6 +75,7 @@ pub fn build_pipeline_subcommands(pipelines: &[Pipeline]) -> Command {
 
     Command::new("pl")
         .about("Pipelines composed of multiple tasks.")
+        .long_about("Set(s) of task(s) composed into multiple stages.")
         .arg_required_else_help(true)
         .arg(
             Arg::new("parallel")

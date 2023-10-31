@@ -17,6 +17,7 @@ type RoxResult<T> = Result<T, Box<dyn Error>>;
 
 /// Get the filepath from the CLI
 fn get_filepath() -> String {
+    // TODO: This is kind of a code smell. No inputs but potentially mutating state via the CLI
     let cli = cli_builder();
     // Get the file arg from the CLI if set
     let cli_matches = cli.clone().arg_required_else_help(false).get_matches();
@@ -37,8 +38,9 @@ pub fn rox() -> RoxResult<()> {
     utils::print_horizontal_rule();
 
     // Build & Generate the CLI based on the loaded Roxfile
-    let cli = construct_cli(roxfile.clone(), &file_path);
     let tasks = inject_task_metadata(roxfile.tasks, &file_path);
+    let pipelines = roxfile.pipelines;
+    let cli = construct_cli(tasks.clone(), pipelines.clone(), &file_path);
     let cli_matches = cli.get_matches();
 
     // Run File and Version checks
@@ -78,8 +80,7 @@ pub fn rox() -> RoxResult<()> {
             .map(|task| (task.name.clone(), task)),
     );
     let pipeline_map: HashMap<String, models::Pipeline> = std::collections::HashMap::from_iter(
-        roxfile
-            .pipelines
+        pipelines
             .into_iter()
             .flatten()
             .map(|pipeline| (pipeline.name.clone(), pipeline)),

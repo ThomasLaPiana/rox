@@ -61,6 +61,10 @@ pub fn inject_task_metadata(tasks: Vec<models::Task>, file_path: &str) -> Vec<mo
         .into_iter()
         .map(|mut task| {
             task.file_path = Some(file_path.to_owned());
+
+            if task.description.is_none() {
+                task.description = task.command.clone()
+            }
             task
         })
         .collect();
