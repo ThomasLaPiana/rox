@@ -1,110 +1,26 @@
+mod cli;
 mod execution;
 mod file_requirements;
+mod model_injection;
 mod models;
+mod output;
 mod utils;
 mod version_requirements;
-use std::collections::HashMap;
 
-use models::RoxFile;
-
+use crate::cli::{cli_builder, construct_cli};
 use crate::execution::{execute_stages, execute_tasks, PassFail, TaskResult};
-mod cli;
-mod output;
+use crate::model_injection::{inject_task_metadata, inject_template_values};
+use std::collections::HashMap;
 use std::error::Error;
 
 type RoxResult<T> = Result<T, Box<dyn Error>>;
 
-/// Inject additional metadata into each Pipeline and sort based on name.
-fn inject_pipeline_metadata(
-    pipelines: Vec<models::Pipeline>,
-    file_path: &str,
-) -> Vec<models::Pipeline> {
-    let mut sorted_pipelines: Vec<models::Pipeline> = pipelines
-        .into_iter()
-        .map(|mut pipeline| {
-            pipeline.file_path = Some(file_path.to_owned());
-            pipeline
-        })
-        .collect();
-    sorted_pipelines.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
-    sorted_pipelines
-}
-
-/// Get used Template's information and inject set values
-fn inject_template_values(mut task: models::Task, template: &models::Template) -> models::Task {
-    task.command = {
-        let mut template_command = template.command.clone();
-        let template_symbols = template.symbols.clone();
-        let task_values = task.values.clone().unwrap();
-
-        for i in 0..task_values.len() {
-            template_command = template_command.replace(
-                template_symbols.get(i).unwrap(),
-                task_values.get(i).unwrap(),
-            );
-        }
-        Some(template_command)
-    };
-    task
-}
-
-#[test]
-fn inject_template_values_valid() {
-    let test_task = models::Task {
-        name: "Test".to_string(),
-        command: None,
-        file_path: None,
-        uses: None,
-        values: Some(vec!["1".to_owned(), "2".to_owned()]),
-        description: None,
-        hide: None,
-        workdir: None,
-    };
-    let test_template = models::Template {
-        name: "Test".to_string(),
-        command: "This is {one} and {two}".to_owned(),
-        symbols: vec!["{one}".to_owned(), "{two}".to_owned()],
-    };
-    let output_task = inject_template_values(test_task, &test_template);
-    assert_eq!(output_task.command.unwrap(), "This is 1 and 2".to_owned())
-}
-
-/// Inject additional metadata into each Task and sort based on name.
-fn inject_task_metadata(tasks: Vec<models::Task>, file_path: &str) -> Vec<models::Task> {
-    let mut sorted_tasks: Vec<models::Task> = tasks
-        .into_iter()
-        .map(|mut task| {
-            task.file_path = Some(file_path.to_owned());
-            task
-        })
-        .collect();
-    sorted_tasks.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
-    sorted_tasks
-}
-
 /// Get the filepath from the CLI
 fn get_filepath() -> String {
-    let cli = cli::cli_builder();
+    let cli = cli_builder();
     // Get the file arg from the CLI if set
     let cli_matches = cli.clone().arg_required_else_help(false).get_matches();
     cli_matches.get_one::<String>("roxfile").unwrap().to_owned()
-}
-
-/// Dyanmically construct the CLI from the Roxfile
-fn construct_cli(roxfile: RoxFile, file_path: &str) -> clap::Command {
-    let mut cli = cli::cli_builder();
-
-    // Tasks
-    let task_subcommands = cli::build_task_subcommands(&roxfile.tasks);
-    cli = cli.subcommands(vec![task_subcommands]);
-
-    // Pipelines
-    if let Some(pipelines) = roxfile.pipelines.clone() {
-        let sorted_pipelines = inject_pipeline_metadata(pipelines, file_path);
-        let pipeline_subcommands = cli::build_pipeline_subcommands(&sorted_pipelines);
-        cli = cli.subcommands(vec![pipeline_subcommands]);
-    }
-    cli
 }
 
 // Entrypoint for the Crate CLI
@@ -118,11 +34,11 @@ pub fn rox() -> RoxResult<()> {
     // Get the file arg from the CLI if set
     let file_path = get_filepath();
     let roxfile = utils::parse_file_contents(utils::load_file(&file_path));
-    utils::horizontal_rule();
+    utils::print_horizontal_rule();
 
-    // Build/Generate the CLI based on the loaded Roxfile
-    let tasks = inject_task_metadata(roxfile.tasks.clone(), &file_path);
+    // Build & Generate the CLI based on the loaded Roxfile
     let cli = construct_cli(roxfile.clone(), &file_path);
+    let tasks = inject_task_metadata(roxfile.tasks, &file_path);
     let cli_matches = cli.get_matches();
 
     // Run File and Version checks
@@ -130,7 +46,7 @@ pub fn rox() -> RoxResult<()> {
         // Check Versions
         if roxfile.version_requirements.is_some() {
             for version_check in roxfile.version_requirements.into_iter().flatten() {
-                version_requirements::check_version(version_check.clone());
+                version_requirements::check_version(version_check);
             }
         }
 

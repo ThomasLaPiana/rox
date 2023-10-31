@@ -1,5 +1,23 @@
-use crate::models::{Pipeline, Task};
+use crate::model_injection::inject_pipeline_metadata;
+use crate::models::{Pipeline, RoxFile, Task};
 use clap::{crate_version, Arg, ArgAction, Command};
+
+/// Dyanmically construct the CLI from the Roxfile
+pub fn construct_cli(roxfile: RoxFile, file_path: &str) -> clap::Command {
+    let mut cli = cli_builder();
+
+    // Tasks
+    let task_subcommands = build_task_subcommands(&roxfile.tasks);
+    cli = cli.subcommands(vec![task_subcommands]);
+
+    // Pipelines
+    if let Some(pipelines) = roxfile.pipelines {
+        let sorted_pipelines = inject_pipeline_metadata(pipelines, file_path);
+        let pipeline_subcommands = build_pipeline_subcommands(&sorted_pipelines);
+        cli = cli.subcommands(vec![pipeline_subcommands]);
+    }
+    cli
+}
 
 /// Construct the CLI
 pub fn cli_builder() -> Command {

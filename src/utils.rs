@@ -35,7 +35,7 @@ where
 }
 
 /// A reusable println! to serve as a visual break
-pub fn horizontal_rule() {
+pub fn print_horizontal_rule() {
     println!("-------------------------------------------");
 }
 
