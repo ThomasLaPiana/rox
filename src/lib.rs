@@ -104,7 +104,10 @@ pub fn rox() -> RoxResult<()> {
             let task_name = args.subcommand_name().unwrap().to_owned();
             vec![execute_tasks(vec![task_name], &task_map, false)]
         }
-        &_ => std::process::abort(),
+        command => {
+            println!("'{}' is not a valid subcommand!", command);
+            std::process::exit(2);
+        }
     };
     output::display_execution_results(results.clone());
     println!(
