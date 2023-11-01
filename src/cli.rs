@@ -15,8 +15,8 @@ pub fn construct_cli(
     cli = cli.subcommands(vec![task_subcommands]);
 
     // Pipelines
-    if pipelines.is_some() {
-        let sorted_pipelines = inject_pipeline_metadata(pipelines.unwrap(), file_path);
+    if let Some(pipelines) = pipelines {
+        let sorted_pipelines = inject_pipeline_metadata(pipelines, file_path);
         let pipeline_subcommands = build_pipeline_subcommands(&sorted_pipelines);
         cli = cli.subcommands(vec![pipeline_subcommands]);
     }
