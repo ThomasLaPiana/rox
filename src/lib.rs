@@ -2,7 +2,7 @@ mod cli;
 mod execution;
 mod file_requirements;
 mod model_injection;
-mod models;
+pub mod models;
 mod output;
 mod utils;
 mod version_requirements;

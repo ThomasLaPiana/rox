@@ -57,12 +57,8 @@ tasks:
   # Release-related
   - name: build-release-binary
     description: "Build a release binary with cargo."
+    command: "cargo build --release"
 
   - name: build-release-image
     description: "Build a production image for Docker."
     command: "docker build tests/files/ -t rox:latest"
-
-  # This won't show up in the CLI help output
-  - name: invalid
-    description: "This task will throw an error becasue it has nothing to do!"
-    hide: true

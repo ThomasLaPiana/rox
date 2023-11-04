@@ -8,10 +8,19 @@ use crate::utils::{color_print, ColorEnum};
 
 // Create a custom Error type for Validation
 #[derive(Debug, Clone)]
-pub struct ValidationError {}
+pub struct ValidationError {
+    pub message: String,
+}
+impl Default for ValidationError {
+    fn default() -> Self {
+        ValidationError {
+            message: String::from("Error: Roxfile syntax is invalid!"),
+        }
+    }
+}
 impl fmt::Display for ValidationError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Roxfile parsing/validation failed!")
+        write!(f, "{}", self.message)
     }
 }
 impl Error for ValidationError {}
@@ -66,16 +75,40 @@ pub struct Task {
 
 impl Validate for Task {
     fn validate(&self) -> Result<(), ValidationError> {
-        let task_fail_message = format!("> Task '{}' failed validation with message:", self.name);
+        let task_fail_message = format!("> Task '{}' failed validation!", self.name);
 
+        // Command and Uses cannot both be none
         if self.command.is_none() & self.uses.is_none() {
             color_print(vec![task_fail_message], ColorEnum::Red);
-            color_print(
-                vec!["A task must have either a 'command' or 'uses' a template!"],
-                ColorEnum::Red,
-            );
-            return Err(ValidationError {});
+            return Err(ValidationError {
+                message: "A Task must implement either 'command' or 'uses'!".to_owned(),
+            });
         }
+
+        // Command and Uses cannot both be Some
+        if self.uses.is_some() & self.command.is_some() {
+            color_print(vec![task_fail_message], ColorEnum::Red);
+            return Err(ValidationError {
+                message: "A Task cannot implement both 'command' & 'uses'!".to_owned(),
+            });
+        }
+
+        // If Uses is Some, Values must also be Some
+        if self.uses.is_some() & self.values.is_none() {
+            color_print(vec![task_fail_message], ColorEnum::Red);
+            return Err(ValidationError {
+                message: "A Task that implements 'uses' must also implement 'values'!".to_owned(),
+            });
+        }
+
+        // If Uses is None, Values must also be None
+        if self.uses.is_none() & self.values.is_some() {
+            color_print(vec![task_fail_message], ColorEnum::Red);
+            return Err(ValidationError {
+                message: "A Task that implements 'values' must also implement 'uses'!".to_owned(),
+            });
+        }
+
         Ok(())
     }
 }
