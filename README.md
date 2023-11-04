@@ -135,43 +135,9 @@ pipelines:
 
 Now that we've seen each individual piece of the Rox puzzle, we can put them all together into a full `roxfile`. See the [example roxfile.yml](roxfile.yml) in this repo for a working example!
 
-## Usage Examples
+## Video Walkthrough
 
-The following are command-line examples for running `rox` with various flags and subcommands.
-
-Show Tasks/Pipelines:
-
-```sh
-rox task
-```
-
-```sh
-rox pl
-```
-
-<https://github.com/ThomasLaPiana/rox/assets/5105354/2041522d-4cb2-4c96-9655-c1802fdf16c8>
-
-Run a Task:
-
-```sh
-rox task build-binary
-```
-
-<https://github.com/ThomasLaPiana/rox/assets/5105354/9f152b3b-8a65-4409-af5c-da029c3e8ae4>
-
-Run a Pipeline:
-
-```sh
-rox pl ci
-```
-
-<https://github.com/ThomasLaPiana/rox/assets/5105354/02d99bc6-0dc1-4c33-a753-2868043c4d43>
-
-Run a Pipeline in Parallel:
-
-```sh
-rox pl -p build-release-all
-```
+The following is a brief video walkthrough of what using `Rox` looks like in a real project:
 
 ## Releasing
 
