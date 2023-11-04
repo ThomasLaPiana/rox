@@ -1,5 +1,5 @@
 //! Utility Functions
-use crate::models::RoxFile;
+use crate::models::{RoxFile, Validate};
 use std::fmt::Display;
 
 use colored::Colorize;
@@ -11,7 +11,9 @@ pub fn load_file(file_path: &str) -> String {
 
 /// Parse a Roxfile into Rust structs
 pub fn parse_file_contents(contents: String) -> RoxFile {
-    serde_yaml::from_str(&contents).expect("Failed to parse the Roxfile!")
+    let roxfile: RoxFile = serde_yaml::from_str(&contents).expect("Failed to parse the Roxfile!");
+    roxfile.validate();
+    roxfile
 }
 
 pub enum ColorEnum {

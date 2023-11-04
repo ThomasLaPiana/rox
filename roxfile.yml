@@ -57,7 +57,6 @@ tasks:
   # Release-related
   - name: build-release-binary
     description: "Build a release binary with cargo."
-    command: "cargo build --release"
 
   - name: build-release-image
     description: "Build a production image for Docker."

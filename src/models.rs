@@ -2,7 +2,10 @@
 //! as well as the validation logic.
 use serde::Deserialize;
 
-// TODO: Add broad validation to each struct
+// Trait for granular schema validation
+pub trait Validate {
+    fn validate(&self) -> Self;
+}
 
 /// Schema for Version Requirement Checks
 ///
@@ -30,10 +33,6 @@ pub struct FileRequirement {
     pub create_if_not_exists: Option<bool>,
 }
 
-pub trait Validate {
-    fn validate(&self);
-}
-
 /// Schema for Tasks in the Roxfile
 ///
 /// Tasks are discrete units of execution
@@ -49,6 +48,16 @@ pub struct Task {
     pub values: Option<Vec<String>>,
     pub hide: Option<bool>,
     pub workdir: Option<String>,
+}
+
+impl Validate for Task {
+    fn validate(&self) -> Self {
+        let validated_task = self.clone();
+        if validated_task.command.is_none() {
+            panic!("The task doesn't have a valid command!")
+        }
+        validated_task
+    }
 }
 
 /// Schema for Templates
@@ -85,4 +94,12 @@ pub struct RoxFile {
     pub pipelines: Option<Vec<Pipeline>>,
     pub templates: Option<Vec<Template>>,
     pub additional_files: Option<Vec<String>>,
+}
+
+impl Validate for RoxFile {
+    fn validate(&self) -> Self {
+        let mut validated_roxfile = self.clone();
+        validated_roxfile.tasks = self.tasks.iter().map(|task| task.validate()).collect();
+        validated_roxfile
+    }
 }
