@@ -11,7 +11,7 @@ file_requirements:
 
 templates:
   - name: docker_build
-    command: "docker build {path} -t rox:{image_tag}"
+    command: "docker build {pat} -t rox:{image_tag}"
     symbols: ["{path}", "{image_tag}"]
 
 pipelines:

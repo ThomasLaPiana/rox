@@ -124,6 +124,25 @@ pub struct Template {
     pub command: String,
     pub symbols: Vec<String>,
 }
+impl Validate for Template {
+    fn validate(&self) -> Result<(), ValidationError> {
+        let failure_message = format!("> Template '{}' failed validation!", self.name);
+
+        // All of the 'Symbol' items must exist within the 'Command'
+        for symbol in self.symbols.clone() {
+            let exists = self.command.contains(&symbol);
+            if !exists {
+                color_print(vec![failure_message], ColorEnum::Red);
+                return Err(ValidationError {
+                    message: "A Template's 'symbols' must all exist within its 'command'!"
+                        .to_owned(),
+                });
+            }
+        }
+
+        Ok(())
+    }
+}
 
 /// Schema for Pipelines
 ///
@@ -155,6 +174,13 @@ impl Validate for RoxFile {
         for task in roxfile.tasks {
             task.validate()?
         }
+
+        if let Some(templates) = roxfile.templates {
+            for template in templates {
+                template.validate()?
+            }
+        }
+
         Ok(())
     }
 }

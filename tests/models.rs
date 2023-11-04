@@ -87,3 +87,33 @@ mod tasks {
         ));
     }
 }
+
+mod templates {
+    use rox::models::{Template, Validate};
+
+    fn build_default_template() -> Template {
+        Template {
+            name: String::from("test_task"),
+            command: String::from("docker build {path}"),
+            symbols: vec!["{path}".to_owned()],
+        }
+    }
+
+    #[test]
+    fn valid_template_ok() {
+        let template = build_default_template();
+        assert!(template.validate().is_ok());
+    }
+
+    #[test]
+    fn template_symbols_not_in_command() {
+        let mut template = build_default_template();
+        template.command = "some string".to_owned();
+
+        let result = template.validate();
+        assert!(result.is_err());
+        assert!(result.is_err_and(
+            |e| e.message == "A Template's 'symbols' must all exist within its 'command'!"
+        ));
+    }
+}
