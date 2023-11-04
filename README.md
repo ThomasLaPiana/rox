@@ -14,6 +14,7 @@ See [gameslog](https://github.com/ThomasLaPiana/gameslog-rs) for an example of u
 ## Table of Contents
 
 - [Why Rox?](#why-rox)
+- [Video Walkthrough](#video-walkthrough)
 - [Installation](#installation)
 - [Roxfile Syntax](#roxfile-syntax)
   - [Version Requirements](#version-requirements)
@@ -22,7 +23,6 @@ See [gameslog](https://github.com/ThomasLaPiana/gameslog-rs) for an example of u
   - [Tasks](#tasks)
   - [Pipelines](#pipelines)
   - [Putting it all Together](#putting-it-all-together)
-- [Usage Examples](#usage-examples)
 
 ## Why Rox?
 
@@ -31,9 +31,15 @@ Rox was created for the purpose of making building and developing applications e
 - __Dynamically Generated CLI__: Rox's tasks and pipelines are dynamically added as subcommands to the CLI at runtime. Configuration is handled entirely in YAML files.
 - __Powerful Primitives__: Using a combination of Rox's primitives (`Tasks`, `Pipelines` and `Templates`) it is possible to handle virtually any use-case with elegance and minimal boilerplate.
 - __Documentation as a First-Class Feature__: Names and descriptions are automatically injected into the CLI at runtime, so your `help` command is always accurate. This helps developers understand what various tasks and pipelines do without needing to dive into the code.
-- __Performant__: Minimal overhead and native executables for a variety of architectures and operating systems. (At time of writing, the `rox task help` command ran in ~5 milliseconds for the given `roxfile.yml`, which includes both startup and file parsing time!)
-- __Efficient__: By utilizing pipelines and parallel execution, developers are empowered to make use of multi-core machines to speed up build and development tasks.
+- __Performant__: Minimal overhead and native executables for a variety of architectures and operating systems.
+- __Efficient__: By utilizing pipeline stages and parallel execution, developers are empowered to make use of multi-core machines to speed up build and development tasks.
 - __User-Friendly__: Task results are shown to the user in an easy-to-consume table format along with useful metadata. This makes debugging easier, and shows potential bottlenecks in build steps.
+
+## Video Walkthrough
+
+The following is a brief video walkthrough of what using `Rox` looks like in a real project:
+
+https://github.com/ThomasLaPiana/rox/assets/5105354/46bddcb4-9240-4ba1-994d-236753587bfc
 
 ## Installation
 
@@ -135,10 +141,6 @@ pipelines:
 
 Now that we've seen each individual piece of the Rox puzzle, we can put them all together into a full `roxfile`. See the [example roxfile.yml](roxfile.yml) in this repo for a working example!
 
-## Video Walkthrough
-
-The following is a brief video walkthrough of what using `Rox` looks like in a real project:
-
 ## Releasing
 
 `Rox` is released by running `cargo release` locally.
@@ -151,11 +153,3 @@ Steps to Release:
 1. `cargo release tag --execute` - Creates a git tag with the same version as the `Cargo.toml`
 1. `cargo release push --execute` - Pushes the git tag
 1. Finally, a CI job is automatically triggered to build and upload the release assets
-
-## Upcoming Features
-
-The following is a list of roughly-planned features that are on the roadmap for Rox.
-
-- Platform-specific tasks - Windows users rejoice
-- Replace `split` with `split_take` - Allow users to choose exactly which split part to use for their version checks
-- Write command outputs to local log files
