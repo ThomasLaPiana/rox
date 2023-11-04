@@ -30,7 +30,6 @@ mod tasks {
         assert!(task.values.is_none());
 
         let result = task.validate();
-        assert!(result.is_err());
         assert!(
             result.is_err_and(|e| e.message == "A Task must implement either 'command' or 'uses'!")
         );
@@ -47,7 +46,6 @@ mod tasks {
         assert!(task.values.is_none());
 
         let result = task.validate();
-        assert!(result.is_err());
         assert!(
             result.is_err_and(|e| e.message == "A Task cannot implement both 'command' & 'uses'!")
         );
@@ -65,7 +63,6 @@ mod tasks {
         assert!(task.values.is_none());
 
         let result = task.validate();
-        assert!(result.is_err());
         assert!(result.is_err_and(
             |e| e.message == "A Task that implements 'uses' must also implement 'values'!"
         ));
@@ -81,7 +78,6 @@ mod tasks {
         assert!(task.values.is_some());
 
         let result = task.validate();
-        assert!(result.is_err());
         assert!(result.is_err_and(
             |e| e.message == "A Task that implements 'values' must also implement 'uses'!"
         ));
@@ -111,9 +107,79 @@ mod templates {
         template.command = "some string".to_owned();
 
         let result = template.validate();
-        assert!(result.is_err());
         assert!(result.is_err_and(
             |e| e.message == "A Template's 'symbols' must all exist within its 'command'!"
+        ));
+    }
+}
+
+mod version_requirements {
+    use rox::models::{Validate, VersionRequirement};
+
+    fn build_default_version_requirements() -> VersionRequirement {
+        VersionRequirement {
+            command: "python --version".to_string(),
+            minimum_version: Some("3.8.0".to_string()),
+            maximum_version: Some("3.13.0".to_string()),
+            split: Some(true),
+        }
+    }
+
+    #[test]
+    fn valid_version_requirement_ok() {
+        let version_requirement = build_default_version_requirements();
+        assert!(version_requirement.validate().is_ok());
+    }
+
+    #[test]
+    fn versions_not_valid() {
+        let mut version_requirement = build_default_version_requirements();
+
+        // Test Min Version
+        let invalid_version = Some("1.a.0".to_owned());
+        version_requirement.minimum_version = invalid_version.clone();
+        version_requirement.maximum_version = None;
+
+        let result = version_requirement.validate();
+        assert!(result.is_err_and(
+            |e| e.message == "Mininum and Maximum versions must be valid semantic version!"
+        ));
+
+        // Test Max Version
+        let invalid_version = Some("1.a.0".to_owned());
+        version_requirement.maximum_version = invalid_version.clone();
+        version_requirement.minimum_version = None;
+
+        let result = version_requirement.validate();
+        assert!(result.is_err_and(
+            |e| e.message == "Mininum and Maximum versions must be valid semantic version!"
+        ));
+    }
+
+    #[test]
+    fn min_ver_smaller_than_max_ver() {
+        let mut version_requirement = build_default_version_requirements();
+
+        version_requirement.minimum_version = Some("2.0.0".to_owned());
+        version_requirement.maximum_version = Some("1.0.0".to_owned());
+
+        let result = version_requirement.validate();
+        assert!(result.is_err_and(
+            |e| e.message == "The Minimum version cannot be larger than the Maximum version!"
+        ));
+    }
+
+    #[test]
+    fn if_split_must_include_a_version_constraint() {
+        let mut version_requirement = build_default_version_requirements();
+
+        version_requirement.split = Some(true);
+        version_requirement.minimum_version = None;
+        version_requirement.maximum_version = None;
+
+        let result = version_requirement.validate();
+        assert!(result.is_err_and(
+            |e| e.message == "If 'split' is defined, either a 'minimum_version' or a 'maximum_version' is also required!"
         ));
     }
 }
