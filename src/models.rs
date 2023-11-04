@@ -1,10 +1,24 @@
 //! Contains the Structs for the Schema of the Roxfile
 //! as well as the validation logic.
 use serde::Deserialize;
+use std::error::Error;
+use std::fmt;
+
+use crate::utils::{color_print, ColorEnum};
+
+// Create a custom Error type for Validation
+#[derive(Debug, Clone)]
+pub struct ValidationError {}
+impl fmt::Display for ValidationError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Roxfile parsing/validation failed!")
+    }
+}
+impl Error for ValidationError {}
 
 // Trait for granular schema validation
 pub trait Validate {
-    fn validate(&self) -> Self;
+    fn validate(&self) -> Result<(), ValidationError>;
 }
 
 /// Schema for Version Requirement Checks
@@ -51,12 +65,18 @@ pub struct Task {
 }
 
 impl Validate for Task {
-    fn validate(&self) -> Self {
-        let validated_task = self.clone();
-        if validated_task.command.is_none() {
-            panic!("The task doesn't have a valid command!")
+    fn validate(&self) -> Result<(), ValidationError> {
+        let task_fail_message = format!("> Task '{}' failed validation with message:", self.name);
+
+        if self.command.is_none() & self.uses.is_none() {
+            color_print(vec![task_fail_message], ColorEnum::Red);
+            color_print(
+                vec!["A task must have either a 'command' or 'uses' a template!"],
+                ColorEnum::Red,
+            );
+            return Err(ValidationError {});
         }
-        validated_task
+        Ok(())
     }
 }
 
@@ -97,9 +117,11 @@ pub struct RoxFile {
 }
 
 impl Validate for RoxFile {
-    fn validate(&self) -> Self {
-        let mut validated_roxfile = self.clone();
-        validated_roxfile.tasks = self.tasks.iter().map(|task| task.validate()).collect();
-        validated_roxfile
+    fn validate(&self) -> Result<(), ValidationError> {
+        let roxfile = self.clone();
+        for task in roxfile.tasks {
+            task.validate()?
+        }
+        Ok(())
     }
 }
