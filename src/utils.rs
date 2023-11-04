@@ -11,7 +11,8 @@ pub fn load_file(file_path: &str) -> String {
 
 /// Parse a Roxfile into Rust structs
 pub fn parse_file_contents(contents: String) -> RoxFile {
-    serde_yaml::from_str(&contents).expect("Failed to parse the Roxfile!")
+    let roxfile: RoxFile = serde_yaml::from_str(&contents).expect("Failed to parse the Roxfile!");
+    roxfile
 }
 
 pub enum ColorEnum {

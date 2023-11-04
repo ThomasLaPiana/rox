@@ -2,7 +2,7 @@ mod cli;
 mod execution;
 mod file_requirements;
 mod model_injection;
-mod models;
+pub mod models;
 mod output;
 mod utils;
 mod version_requirements;
@@ -10,6 +10,7 @@ mod version_requirements;
 use crate::cli::{cli_builder, construct_cli};
 use crate::execution::{execute_stages, execute_tasks, PassFail, TaskResult};
 use crate::model_injection::{inject_task_metadata, inject_template_values};
+use crate::models::Validate;
 use std::collections::HashMap;
 use std::error::Error;
 
@@ -35,6 +36,7 @@ pub fn rox() -> RoxResult<()> {
     // Get the file arg from the CLI if set
     let file_path = get_filepath();
     let roxfile = utils::parse_file_contents(utils::load_file(&file_path));
+    roxfile.validate()?;
     utils::print_horizontal_rule();
 
     // Build & Generate the CLI based on the loaded Roxfile
