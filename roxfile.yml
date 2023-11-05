@@ -2,10 +2,6 @@ version_requirements:
   - command: "cargo nextest --version"
     minimum_version: "0.9.0"
     split: true
-  
-  - command: "rox --version"
-    minimum_version: "0.4.2"
-    split: true
 
 file_requirements:
   - path: "Cargo.toml"
