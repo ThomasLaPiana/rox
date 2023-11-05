@@ -57,7 +57,7 @@ impl Validate for VersionRequirement {
             .into_iter()
             .flatten()
             .collect();
-        for version in versions.clone() {
+        for version in versions.iter() {
             if Version::from_str(version).is_err() {
                 color_print(vec![failure_message], ColorEnum::Red);
                 return Err(ValidationError {
@@ -181,8 +181,8 @@ impl Validate for Template {
         let failure_message = format!("> Template '{}' failed validation!", self.name);
 
         // All of the 'Symbol' items must exist within the 'Command'
-        for symbol in self.symbols.clone() {
-            let exists = self.command.contains(&symbol);
+        for symbol in &self.symbols {
+            let exists = self.command.contains(symbol);
             if !exists {
                 color_print(vec![failure_message], ColorEnum::Red);
                 return Err(ValidationError {
@@ -205,7 +205,6 @@ pub struct Pipeline {
     pub name: String,
     pub description: Option<String>,
     pub stages: Vec<Vec<String>>,
-    pub file_path: Option<String>,
 }
 
 /// The top-level structure of the Roxfile
@@ -222,22 +221,20 @@ pub struct RoxFile {
 
 impl Validate for RoxFile {
     fn validate(&self) -> Result<(), ValidationError> {
-        let roxfile = self.clone();
-
         // Task Validation
-        for task in roxfile.tasks {
+        for task in &self.tasks {
             task.validate()?
         }
 
         // Template Validation
-        if let Some(templates) = roxfile.templates {
+        if let Some(templates) = &self.templates {
             for template in templates {
                 template.validate()?
             }
         }
 
         // Version Requirement Validation
-        if let Some(version_requirements) = roxfile.version_requirements {
+        if let Some(version_requirements) = &self.version_requirements {
             for requirement in version_requirements {
                 requirement.validate()?
             }

@@ -55,7 +55,7 @@ pub fn run_task(task: &Task) -> TaskResult {
         name: task.name.to_string(),
         result: get_result_passfail(command_results),
         elapsed_time: start.elapsed().as_secs(),
-        file_path: task.file_path.clone().unwrap(),
+        file_path: task.file_path.to_owned().unwrap(),
     }
 }
 
@@ -92,7 +92,7 @@ pub fn execute_tasks(
 
 /// Execute a vector of Stages
 pub fn execute_stages(
-    stages: Vec<Vec<String>>,
+    stages: &[Vec<String>],
     task_map: &HashMap<String, Task>,
     parallel: bool,
 ) -> Vec<Vec<TaskResult>> {

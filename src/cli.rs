@@ -1,23 +1,17 @@
-use crate::model_injection::inject_pipeline_metadata;
 use crate::models::{Pipeline, Task};
 use clap::{crate_version, Arg, ArgAction, Command};
 
 /// Dyanmically construct the CLI from the Roxfile
-pub fn construct_cli(
-    tasks: Vec<Task>,
-    pipelines: Option<Vec<Pipeline>>,
-    file_path: &str,
-) -> clap::Command {
+pub fn construct_cli(tasks: &[Task], pipelines: &Option<Vec<Pipeline>>) -> clap::Command {
     let mut cli = cli_builder();
 
     // Tasks
-    let task_subcommands = build_task_subcommands(&tasks);
+    let task_subcommands = build_task_subcommands(tasks);
     cli = cli.subcommands(vec![task_subcommands]);
 
     // Pipelines
     if let Some(pipelines) = pipelines {
-        let sorted_pipelines = inject_pipeline_metadata(pipelines, file_path);
-        let pipeline_subcommands = build_pipeline_subcommands(&sorted_pipelines);
+        let pipeline_subcommands = build_pipeline_subcommands(pipelines);
         cli = cli.subcommands(vec![pipeline_subcommands]);
     }
     cli
@@ -54,7 +48,7 @@ pub fn build_task_subcommands(tasks: &[Task]) -> Command {
     let subcommands: Vec<Command> = tasks
         .iter()
         .filter(|target| !target.hide.unwrap_or_default())
-        .map(|task| Command::new(&task.name).about(task.description.clone().unwrap_or_default()))
+        .map(|task| Command::new(&task.name).about(task.description.to_owned().unwrap_or_default()))
         .collect();
 
     Command::new("task")
