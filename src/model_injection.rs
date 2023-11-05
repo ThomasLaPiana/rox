@@ -2,26 +2,21 @@ use crate::models;
 
 /// Inject additional metadata into each Pipeline and sort based on name.
 pub fn inject_pipeline_metadata(
-    pipelines: Vec<models::Pipeline>,
-    file_path: &str,
-) -> Vec<models::Pipeline> {
-    let mut sorted_pipelines: Vec<models::Pipeline> = pipelines
-        .into_iter()
-        .map(|mut pipeline| {
-            pipeline.file_path = Some(file_path.to_owned());
-            pipeline
-        })
-        .collect();
-    sorted_pipelines.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
-    sorted_pipelines
+    pipelines: Option<Vec<models::Pipeline>>,
+) -> Option<Vec<models::Pipeline>> {
+    if let Some(mut some_pipelines) = pipelines {
+        some_pipelines.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
+        return Some(some_pipelines);
+    }
+    pipelines
 }
 
 /// Get used Template's information and inject set values
 pub fn inject_template_values(mut task: models::Task, template: &models::Template) -> models::Task {
     task.command = {
-        let mut template_command = template.command.clone();
-        let template_symbols = template.symbols.clone();
-        let task_values = task.values.clone().unwrap();
+        let mut template_command = template.command.to_owned();
+        let template_symbols = template.symbols.to_owned();
+        let task_values = task.values.as_ref().unwrap();
 
         for i in 0..task_values.len() {
             template_command = template_command.replace(
@@ -63,7 +58,7 @@ pub fn inject_task_metadata(tasks: Vec<models::Task>, file_path: &str) -> Vec<mo
             task.file_path = Some(file_path.to_owned());
 
             if task.description.is_none() {
-                task.description = task.command.clone()
+                task.description = task.command.to_owned()
             }
             task
         })

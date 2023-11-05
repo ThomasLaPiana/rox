@@ -2,13 +2,13 @@ use crate::execution::{PassFail, TaskResult};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
 use colored::Colorize;
 
-pub fn display_execution_results(results: Vec<Vec<TaskResult>>) {
+pub fn display_execution_results(results: &[Vec<TaskResult>]) {
     let mut table = Vec::new();
 
-    for (i, stage_results) in results.into_iter().enumerate() {
+    for (i, stage_results) in results.iter().enumerate() {
         for result in stage_results {
             table.push(vec![
-                result.name.cell(),
+                result.name.to_owned().cell(),
                 format!("{}", i + 1).cell().justify(Justify::Center),
                 match result.result {
                     PassFail::Pass => result
@@ -25,7 +25,7 @@ pub fn display_execution_results(results: Vec<Vec<TaskResult>>) {
                         .justify(Justify::Center),
                 },
                 result.elapsed_time.cell().justify(Justify::Center),
-                result.file_path.cell().justify(Justify::Right),
+                result.file_path.to_owned().cell().justify(Justify::Right),
             ])
         }
     }
