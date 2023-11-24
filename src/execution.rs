@@ -1,6 +1,5 @@
 //! This is the module responsible for executing tasks.
 use crate::models::Task;
-use crate::utils;
 use std::collections::HashMap;
 use std::process::{Command, ExitStatus};
 
@@ -43,12 +42,13 @@ pub fn run_task(task: &Task) -> TaskResult {
     let start = std::time::Instant::now();
 
     let workdir = task.workdir.clone().unwrap_or(".".to_string());
+    let command = task.command.as_ref().unwrap();
 
-    println!("> Running command: '{}'", task.command.as_ref().unwrap());
-    let (command, args) = utils::split_head_from_rest(task.command.as_ref().unwrap());
-    let command_results = Command::new(command)
+    println!("> Running command: '{}'", command);
+    let command_results = Command::new("sh")
         .current_dir(workdir)
-        .args(args)
+        .arg("-c")
+        .arg(command)
         .status();
 
     TaskResult {
