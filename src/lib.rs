@@ -8,11 +8,12 @@ mod utils;
 mod version_requirements;
 
 use crate::cli::{cli_builder, construct_cli};
-use crate::execution::{execute_stages, execute_tasks, PassFail, TaskResult};
+use crate::execution::{execute_stages, execute_tasks};
 use crate::model_injection::{
     inject_pipeline_metadata, inject_task_metadata, inject_template_values,
 };
-use crate::models::Validate;
+use crate::models::{AllResults, Validate};
+use crate::models::{PassFail, TaskResult};
 use std::collections::HashMap;
 use std::error::Error;
 
@@ -32,6 +33,7 @@ fn get_filepath_arg_value() -> String {
 /// Entrypoint for the Crate CLI
 pub fn rox() -> RoxResult<()> {
     let start = std::time::Instant::now();
+    let execution_start = chrono::Utc::now().to_rfc3339();
 
     // NOTE: Due to the dynamically generated nature of the CLI,
     // It is required to parse the CLI matches twice. Once to get
@@ -91,25 +93,33 @@ pub fn rox() -> RoxResult<()> {
             .flatten()
             .map(|pipeline| (pipeline.name.to_owned(), pipeline)),
     );
+    // Deconstruct the CLI commands and get the Pipeline object that was called
+    let (_, args) = cli_matches.subcommand().unwrap();
+    let subcommand_name = args.subcommand_name().unwrap_or("default");
 
     // Execute the Task(s)
     let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
+        "logs" => {
+            let number = args.get_one::<i8>("number").unwrap();
+            output::display_logs(number);
+            std::process::exit(0);
+        }
         "pl" => {
-            // Deconstruct the CLI commands and get the Pipeline object that was called
-            let (_, args) = cli_matches.subcommand().unwrap();
-            let pipeline_name = args.subcommand_name().unwrap();
             let parallel = args.get_flag("parallel");
             let execution_results = execute_stages(
-                &pipeline_map.get(pipeline_name).unwrap().stages,
+                &pipeline_map.get(subcommand_name).unwrap().stages,
                 &task_map,
                 parallel,
             );
             execution_results
         }
         "task" => {
-            let (_, args) = cli_matches.subcommand().unwrap();
-            let task_name = args.subcommand_name().unwrap().to_owned();
-            let execution_results = vec![execute_tasks(vec![task_name], &task_map, false)];
+            let execution_results = vec![execute_tasks(
+                vec![subcommand_name.to_string()],
+                0,
+                &task_map,
+                false,
+            )];
             execution_results
         }
         command => {
@@ -117,6 +127,15 @@ pub fn rox() -> RoxResult<()> {
             std::process::exit(2);
         }
     };
+    let results = AllResults {
+        job_name: subcommand_name.to_string(),
+        execution_time: execution_start,
+        results: results.into_iter().flatten().collect(),
+    };
+
+    let log_path = output::write_logs(&results);
+    println!("> Log file written to: {}", log_path);
+
     output::display_execution_results(&results);
     println!(
         "> Total elapsed time: {}s | {}ms",
@@ -129,9 +148,9 @@ pub fn rox() -> RoxResult<()> {
 }
 
 /// Throw a non-zero exit if any Task(s) had a failing result
-pub fn nonzero_exit_if_failure(results: &[Vec<TaskResult>]) {
+pub fn nonzero_exit_if_failure(results: &AllResults) {
     // TODO: Figure out a way to get this info without looping again
-    for result in results.iter().flatten() {
+    for result in results.results.iter() {
         if result.result == PassFail::Fail {
             std::process::exit(2)
         }

@@ -1,28 +1,7 @@
-//! This is the module responsible for executing tasks.
-use crate::models::Task;
+use crate::models::{PassFail, Task, TaskResult};
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use std::collections::HashMap;
 use std::process::{Command, ExitStatus};
-
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
-
-#[derive(PartialEq, Debug, Clone)]
-pub enum PassFail {
-    Pass,
-    Fail,
-}
-impl std::fmt::Display for PassFail {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-#[derive(PartialEq, Debug, Clone)]
-pub struct TaskResult {
-    pub name: String,
-    pub result: PassFail,
-    pub elapsed_time: u64,
-    pub file_path: String,
-}
 
 pub fn get_result_passfail(result: Result<ExitStatus, std::io::Error>) -> PassFail {
     // If the command doesn't exist, we get an error here
@@ -38,7 +17,7 @@ pub fn get_result_passfail(result: Result<ExitStatus, std::io::Error>) -> PassFa
 }
 
 /// Run a Task
-pub fn run_task(task: &Task) -> TaskResult {
+pub fn run_task(task: &Task, stage_number: i8) -> TaskResult {
     let start = std::time::Instant::now();
 
     let workdir = task.workdir.clone().unwrap_or(".".to_string());
@@ -53,8 +32,10 @@ pub fn run_task(task: &Task) -> TaskResult {
 
     TaskResult {
         name: task.name.to_string(),
+        command: command.to_string(),
+        stage: stage_number + 1,
         result: get_result_passfail(command_results),
-        elapsed_time: start.elapsed().as_secs(),
+        elapsed_time: start.elapsed().as_secs() as i64,
         file_path: task.file_path.to_owned().unwrap(),
     }
 }
@@ -62,6 +43,7 @@ pub fn run_task(task: &Task) -> TaskResult {
 /// Execute a vector of Tasks, potentially in parallel
 pub fn execute_tasks(
     tasks: Vec<String>,
+    stage_number: i8,
     task_map: &HashMap<String, Task>,
     parallel: bool,
 ) -> Vec<TaskResult> {
@@ -84,9 +66,15 @@ pub fn execute_tasks(
 
     // TODO: Add progress bars?
     if parallel {
-        return task_stack.par_iter().map(run_task).collect();
+        return task_stack
+            .par_iter()
+            .map(|task| run_task(task, stage_number))
+            .collect();
     } else {
-        return task_stack.iter().map(run_task).collect();
+        return task_stack
+            .iter()
+            .map(|task| run_task(task, stage_number))
+            .collect();
     }
 }
 
@@ -98,7 +86,10 @@ pub fn execute_stages(
 ) -> Vec<Vec<TaskResult>> {
     let stage_results: Vec<Vec<TaskResult>> = stages
         .iter()
-        .map(|stage| execute_tasks(stage.clone(), task_map, parallel))
+        .enumerate()
+        .map(|(stage_number, stage)| {
+            execute_tasks(stage.clone(), stage_number as i8, task_map, parallel)
+        })
         .collect();
     stage_results
 }

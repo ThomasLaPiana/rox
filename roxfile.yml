@@ -23,8 +23,7 @@ pipelines:
   - name: ci
     description: "Run all CI-related tasks"
     stages:
-      - ["fmt", "clippy-ci"]
-      - ["test"]
+      - ["fmt", "clippy-ci", "test"]
 
 tasks:
   - name: "wt"

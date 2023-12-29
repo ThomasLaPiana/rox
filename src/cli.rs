@@ -41,6 +41,18 @@ pub fn cli_builder() -> Command {
                 .action(ArgAction::SetTrue)
                 .help("Skip the version and file requirement checks."),
         )
+        .subcommand(
+            Command::new("logs")
+                .about("View logs for Rox invocations.")
+                .arg(
+                    Arg::new("number")
+                        .help("The number of logs to view.")
+                        .required(false)
+                        .short('n')
+                        .value_parser(clap::value_parser!(i8))
+                        .default_value("1"),
+                ),
+        )
 }
 
 /// Build the `task` subcommand with individual tasks nested as subcommands

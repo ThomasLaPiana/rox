@@ -1,12 +1,42 @@
 //! Contains the Structs for the Schema of the Roxfile
 //! as well as the validation logic.
 use semver::{Version, VersionReq};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
 use std::str::FromStr;
 
 use crate::utils::{color_print, ColorEnum};
+
+/// Format for completed executions
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AllResults {
+    pub job_name: String,
+    pub execution_time: String,
+    pub results: Vec<TaskResult>,
+}
+
+/// Enum for task command status
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub enum PassFail {
+    Pass,
+    Fail,
+}
+impl std::fmt::Display for PassFail {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Deserialize, Serialize)]
+pub struct TaskResult {
+    pub name: String,
+    pub command: String,
+    pub stage: i8,
+    pub result: PassFail,
+    pub elapsed_time: i64,
+    pub file_path: String,
+}
 
 // Create a custom Error type for Validation
 #[derive(Debug, Clone)]
