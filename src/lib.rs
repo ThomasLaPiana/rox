@@ -116,7 +116,7 @@ pub fn rox() -> RoxResult<()> {
         "task" => {
             let execution_results = vec![execute_tasks(
                 vec![subcommand_name.to_string()],
-                1,
+                0,
                 &task_map,
                 false,
             )];
