@@ -12,6 +12,7 @@ use crate::utils::{color_print, ColorEnum};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AllResults {
     pub job_name: String,
+    pub execution_time: String,
     pub results: Vec<TaskResult>,
 }
 

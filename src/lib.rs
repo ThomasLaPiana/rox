@@ -33,6 +33,7 @@ fn get_filepath_arg_value() -> String {
 /// Entrypoint for the Crate CLI
 pub fn rox() -> RoxResult<()> {
     let start = std::time::Instant::now();
+    let execution_start = chrono::Utc::now().to_rfc3339();
 
     // NOTE: Due to the dynamically generated nature of the CLI,
     // It is required to parse the CLI matches twice. Once to get
@@ -100,8 +101,8 @@ pub fn rox() -> RoxResult<()> {
     let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
         "logs" => {
             let number = args.get_one::<i8>("number").unwrap();
-            todo!();
-            std::process::exit(0)
+            output::display_logs(number);
+            std::process::exit(0);
         }
         "pl" => {
             let parallel = args.get_flag("parallel");
@@ -128,10 +129,11 @@ pub fn rox() -> RoxResult<()> {
     };
     let results = AllResults {
         job_name: subcommand_name.to_string(),
+        execution_time: execution_start,
         results: results.into_iter().flatten().collect(),
     };
 
-    let log_path = output::write_logs(subcommand_name, &results);
+    let log_path = output::write_logs(&results);
     println!("> Log file written to: {}", log_path);
 
     output::display_execution_results(&results);

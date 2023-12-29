@@ -1,22 +1,34 @@
-use crate::models::{AllResults, PassFail, TaskResult};
+use crate::models::{AllResults, PassFail};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
 use colored::Colorize;
 
 const LOG_DIR: &str = ".rox";
 
 /// Load execution results from a log file
-pub fn load_logs(number: i8) {
+pub fn display_logs(number: &i8) {
     let mut filenames = std::fs::read_dir(LOG_DIR)
         .unwrap()
         .map(|res| res.map(|e| e.path()))
         .collect::<Result<Vec<_>, std::io::Error>>()
         .unwrap();
     filenames.sort();
-    todo!();
+
+    let results = filenames
+        .iter()
+        .take(*number as usize)
+        .map(|filename| {
+            let contents = std::fs::read_to_string(filename).unwrap();
+            serde_yaml::from_str(&contents).unwrap()
+        })
+        .collect::<Vec<AllResults>>();
+
+    for result in results.iter() {
+        display_execution_results(result)
+    }
 }
 
 /// Write the execution results to a log file
-pub fn write_logs(subcommand_name: &str, results: &AllResults) -> String {
+pub fn write_logs(results: &AllResults) -> String {
     let filename = format!("rox-{}.log.yaml", chrono::Utc::now().to_rfc3339());
     let filepath = format!("{}/{}", LOG_DIR, filename);
 
@@ -52,10 +64,10 @@ pub fn display_execution_results(results: &AllResults) {
                     .justify(Justify::Center),
             },
             result.elapsed_time.cell().justify(Justify::Center),
-            result.command.to_owned().cell().justify(Justify::Right),
         ])
     }
 
+    println!("> {} | {}", results.job_name, results.execution_time);
     assert!(print_stdout(
         table
             .table()
@@ -64,7 +76,6 @@ pub fn display_execution_results(results: &AllResults) {
                 "Stage".yellow().cell().bold(true),
                 "Result".yellow().cell().bold(true),
                 "Run Time (sec)".yellow().cell().bold(true),
-                "Command".yellow().cell().bold(true),
             ])
             .bold(true),
     )
