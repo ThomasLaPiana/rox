@@ -8,11 +8,12 @@ mod utils;
 mod version_requirements;
 
 use crate::cli::{cli_builder, construct_cli};
-use crate::execution::{execute_stages, execute_tasks, PassFail, TaskResult};
+use crate::execution::{execute_stages, execute_tasks};
 use crate::model_injection::{
     inject_pipeline_metadata, inject_task_metadata, inject_template_values,
 };
-use crate::models::Validate;
+use crate::models::{AllResults, Validate};
+use crate::models::{PassFail, TaskResult};
 use std::collections::HashMap;
 use std::error::Error;
 
@@ -93,10 +94,15 @@ pub fn rox() -> RoxResult<()> {
     );
     // Deconstruct the CLI commands and get the Pipeline object that was called
     let (_, args) = cli_matches.subcommand().unwrap();
-    let subcommand_name = args.subcommand_name().unwrap();
+    let subcommand_name = args.subcommand_name().unwrap_or("default");
 
     // Execute the Task(s)
     let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
+        "logs" => {
+            let number = args.get_one::<i8>("number").unwrap();
+            todo!();
+            std::process::exit(0)
+        }
         "pl" => {
             let parallel = args.get_flag("parallel");
             let execution_results = execute_stages(
@@ -109,6 +115,7 @@ pub fn rox() -> RoxResult<()> {
         "task" => {
             let execution_results = vec![execute_tasks(
                 vec![subcommand_name.to_string()],
+                1,
                 &task_map,
                 false,
             )];
@@ -119,8 +126,12 @@ pub fn rox() -> RoxResult<()> {
             std::process::exit(2);
         }
     };
+    let results = AllResults {
+        job_name: subcommand_name.to_string(),
+        results: results.into_iter().flatten().collect(),
+    };
 
-    let log_path = output::format_log_results(subcommand_name, &results);
+    let log_path = output::write_logs(subcommand_name, &results);
     println!("> Log file written to: {}", log_path);
 
     output::display_execution_results(&results);
@@ -135,9 +146,9 @@ pub fn rox() -> RoxResult<()> {
 }
 
 /// Throw a non-zero exit if any Task(s) had a failing result
-pub fn nonzero_exit_if_failure(results: &[Vec<TaskResult>]) {
+pub fn nonzero_exit_if_failure(results: &AllResults) {
     // TODO: Figure out a way to get this info without looping again
-    for result in results.iter().flatten() {
+    for result in results.results.iter() {
         if result.result == PassFail::Fail {
             std::process::exit(2)
         }
