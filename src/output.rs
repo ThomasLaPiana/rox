@@ -23,6 +23,7 @@ pub fn display_logs(number: &i8) {
         .collect::<Vec<AllResults>>();
 
     for result in results.iter() {
+        println!("\n> {} | {}", result.job_name, result.execution_time);
         display_execution_results(result)
     }
 }
@@ -67,7 +68,6 @@ pub fn display_execution_results(results: &AllResults) {
         ])
     }
 
-    println!("> {} | {}", results.job_name, results.execution_time);
     assert!(print_stdout(
         table
             .table()
