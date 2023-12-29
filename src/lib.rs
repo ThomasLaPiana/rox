@@ -91,25 +91,27 @@ pub fn rox() -> RoxResult<()> {
             .flatten()
             .map(|pipeline| (pipeline.name.to_owned(), pipeline)),
     );
+    // Deconstruct the CLI commands and get the Pipeline object that was called
+    let (_, args) = cli_matches.subcommand().unwrap();
+    let subcommand_name = args.subcommand_name().unwrap();
 
     // Execute the Task(s)
     let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
         "pl" => {
-            // Deconstruct the CLI commands and get the Pipeline object that was called
-            let (_, args) = cli_matches.subcommand().unwrap();
-            let pipeline_name = args.subcommand_name().unwrap();
             let parallel = args.get_flag("parallel");
             let execution_results = execute_stages(
-                &pipeline_map.get(pipeline_name).unwrap().stages,
+                &pipeline_map.get(subcommand_name).unwrap().stages,
                 &task_map,
                 parallel,
             );
             execution_results
         }
         "task" => {
-            let (_, args) = cli_matches.subcommand().unwrap();
-            let task_name = args.subcommand_name().unwrap().to_owned();
-            let execution_results = vec![execute_tasks(vec![task_name], &task_map, false)];
+            let execution_results = vec![execute_tasks(
+                vec![subcommand_name.to_string()],
+                &task_map,
+                false,
+            )];
             execution_results
         }
         command => {
@@ -117,6 +119,10 @@ pub fn rox() -> RoxResult<()> {
             std::process::exit(2);
         }
     };
+
+    let log_path = output::format_log_results(subcommand_name, &results);
+    println!("> Log file written to: {}", log_path);
+
     output::display_execution_results(&results);
     println!(
         "> Total elapsed time: {}s | {}ms",

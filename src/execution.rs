@@ -1,11 +1,10 @@
-//! This is the module responsible for executing tasks.
 use crate::models::Task;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::process::{Command, ExitStatus};
 
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
-
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub enum PassFail {
     Pass,
     Fail,
@@ -16,11 +15,12 @@ impl std::fmt::Display for PassFail {
     }
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Deserialize, Serialize)]
 pub struct TaskResult {
     pub name: String,
+    pub command: String,
     pub result: PassFail,
-    pub elapsed_time: u64,
+    pub elapsed_time: i64,
     pub file_path: String,
 }
 
@@ -53,8 +53,9 @@ pub fn run_task(task: &Task) -> TaskResult {
 
     TaskResult {
         name: task.name.to_string(),
+        command: command.to_string(),
         result: get_result_passfail(command_results),
-        elapsed_time: start.elapsed().as_secs(),
+        elapsed_time: start.elapsed().as_secs() as i64,
         file_path: task.file_path.to_owned().unwrap(),
     }
 }
