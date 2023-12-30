@@ -23,7 +23,7 @@ type RoxResult<T> = Result<T, Box<dyn Error>>;
 /// This is required because we might need to
 /// dynamically populate the CLI based on this arg
 fn get_filepath_arg_value() -> String {
-    let cli = cli_builder();
+    let cli = cli_builder(false);
     // Get the file arg from the CLI if set
     let cli_matches = cli.clone().arg_required_else_help(false).get_matches();
     cli_matches.get_one::<String>("roxfile").unwrap().to_owned()
@@ -116,10 +116,7 @@ pub fn rox() -> RoxResult<()> {
             )];
             execution_results
         }
-        command => {
-            println!("'{}' is not a valid subcommand!", command);
-            std::process::exit(2);
-        }
+        _ => unreachable!("Invalid subcommand"),
     };
     let results = AllResults {
         job_name: subcommand_name.to_string(),

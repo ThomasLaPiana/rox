@@ -7,7 +7,7 @@ pub fn construct_cli(
     pipelines: &Option<Vec<Pipeline>>,
     docs: &Option<Vec<Docs>>,
 ) -> clap::Command {
-    let mut cli = cli_builder();
+    let mut cli = cli_builder(true);
 
     // Docs
     if let Some(docs) = docs {
@@ -28,12 +28,12 @@ pub fn construct_cli(
 }
 
 /// Construct the CLI
-pub fn cli_builder() -> Command {
+pub fn cli_builder(strict_subcommands: bool) -> Command {
     Command::new("rox")
         .about("Rox: The Robust Developer Experience CLI")
         .version(crate_version!())
         .arg_required_else_help(true)
-        .allow_external_subcommands(true)
+        .allow_external_subcommands(!strict_subcommands)
         // TODO: Add a "watch" flag to run the command on file changes to a path?
         .arg(
             Arg::new("roxfile")
