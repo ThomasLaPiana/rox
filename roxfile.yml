@@ -1,3 +1,24 @@
+docs:
+  - name: "markdown"
+    description: "Development-related documentation"
+    kind: markdown
+    path: "docs/dev_docs.md"
+
+  - name: "readme"
+    description: "Development-related documentation"
+    kind: markdown
+    path: "README.md"
+
+  - name: "text"
+    description: "Development-related documentation"
+    kind: text 
+    path: "docs/dev_docs.txt"
+
+  - name: "url"
+    description: "Development-related documentation"
+    kind: url
+    path: "http://google.com"
+
 templates:
   - name: docker_build
     command: "docker build {path} -t rox:{image_tag}"

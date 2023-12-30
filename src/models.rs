@@ -25,6 +25,22 @@ impl std::fmt::Display for PassFail {
     }
 }
 
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum DocsKind {
+    Markdown,
+    Text,
+    URL,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct Docs {
+    pub name: String,
+    pub description: Option<String>,
+    pub kind: DocsKind,
+    pub path: String,
+}
+
 #[derive(PartialEq, Debug, Clone, Deserialize, Serialize)]
 pub struct TaskResult {
     pub name: String,
@@ -162,6 +178,7 @@ pub struct Pipeline {
 #[derive(Deserialize, Debug, Default, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct RoxFile {
+    pub docs: Option<Vec<Docs>>,
     pub tasks: Vec<Task>,
     pub pipelines: Option<Vec<Pipeline>>,
     pub templates: Option<Vec<Template>>,
