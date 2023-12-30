@@ -16,7 +16,6 @@ pub fn parse_file_contents(contents: String) -> RoxFile {
 }
 
 pub enum ColorEnum {
-    Green,
     Red,
 }
 
@@ -30,7 +29,6 @@ where
         .fold("".to_string(), |x, y| format!("{}{}", x, y));
 
     match color {
-        ColorEnum::Green => println!("{}", concat_output.green()),
         ColorEnum::Red => println!("{}", concat_output.red()),
     }
 }
