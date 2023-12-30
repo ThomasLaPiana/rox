@@ -23,7 +23,6 @@ clap = { version = "4.4.4", features = ["string", "cargo"] }
 cli-table = "0.4.7"
 colored = "2.0.4"
 rayon = "1.8.0"
-semver = "1.0.18"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_yaml = "0.9.25"
 

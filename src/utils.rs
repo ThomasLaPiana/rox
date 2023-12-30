@@ -39,27 +39,3 @@ where
 pub fn print_horizontal_rule() {
     println!("-------------------------------------------");
 }
-
-/// Split a string on spaces and return the head + the remainder
-pub fn split_head_from_rest(snek: &str) -> (String, Vec<String>) {
-    let mut split_snek = snek.split(' ');
-    let head: String = split_snek.next().unwrap().to_owned();
-    let remainder: Vec<String> = split_snek.map(|x| x.to_owned()).collect();
-    (head, remainder)
-}
-
-#[test]
-fn split_head_valid() {
-    assert_eq!(
-        (
-            "Foo".to_string(),
-            vec!["Bar".to_string(), "Baz".to_string()]
-        ),
-        split_head_from_rest("Foo Bar Baz")
-    );
-}
-
-#[test]
-fn split_head_single() {
-    assert_eq!(("Foo".to_string(), vec![]), split_head_from_rest("Foo"));
-}

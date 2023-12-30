@@ -1,12 +1,9 @@
 //! Contains the Structs for the Schema of the Roxfile
 //! as well as the validation logic.
-use semver::{Version, VersionReq};
+use crate::utils::{color_print, ColorEnum};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
-use std::str::FromStr;
-
-use crate::utils::{color_print, ColorEnum};
 
 /// Format for completed executions
 #[derive(Serialize, Deserialize, Debug)]
@@ -60,82 +57,6 @@ impl Error for ValidationError {}
 // Trait for granular schema validation
 pub trait Validate {
     fn validate(&self) -> Result<(), ValidationError>;
-}
-
-/// Schema for Version Requirement Checks
-///
-/// Runs the specified commands and checks that
-/// output is a valid version that falls within
-/// the defined minimum and maximum allowed versions.
-#[derive(Deserialize, Debug, Clone, Default)]
-#[serde(deny_unknown_fields)]
-pub struct VersionRequirement {
-    pub command: String,
-    pub minimum_version: Option<String>,
-    pub maximum_version: Option<String>,
-    pub split: Option<bool>, // TODO: Make this name more clear, or let the user choose with item to take after split
-}
-impl Validate for VersionRequirement {
-    fn validate(&self) -> Result<(), ValidationError> {
-        let failure_message = format!(
-            "> Version Requirement '{}' failed validation!",
-            self.command
-        );
-
-        // Versions must be valid Semantic Versions
-        let versions: Vec<&String> = vec![&self.minimum_version, &self.maximum_version]
-            .into_iter()
-            .flatten()
-            .collect();
-        for version in versions.iter() {
-            if Version::from_str(version).is_err() {
-                color_print(vec![failure_message], ColorEnum::Red);
-                return Err(ValidationError {
-                    message: "Mininum and Maximum versions must be valid semantic version!"
-                        .to_owned(),
-                });
-            }
-        }
-
-        // Make sure that the Maximum version isn't smaller than the Minimum version
-        if self.maximum_version.is_some() && self.maximum_version.is_some() {
-            let valid_version_constraints =
-                VersionReq::from_str(&format!("> {}", self.minimum_version.as_ref().unwrap()))
-                    .unwrap()
-                    .matches(&Version::from_str(self.maximum_version.as_ref().unwrap()).unwrap());
-
-            if !valid_version_constraints {
-                color_print(vec![failure_message], ColorEnum::Red);
-                return Err(ValidationError {
-                    message: "The Minimum version cannot be larger than the Maximum version!"
-                        .to_owned(),
-                });
-            }
-        }
-
-        // If Split is Some, either Min or Max Version must be Some
-        if self.split.is_some() && versions.is_empty() {
-            color_print(vec![failure_message], ColorEnum::Red);
-            return Err(ValidationError {
-                message: "If 'split' is defined, either a 'minimum_version' or a 'maximum_version' is also required!"
-                    .to_owned(),
-            });
-        }
-
-        Ok(())
-    }
-}
-
-/// Schema for File Requirement Checks
-///
-/// This verifies that the file exists locally,
-/// or can be configured to create the file
-/// if its missing.
-#[derive(Deserialize, Debug, Clone, Default)]
-#[serde(deny_unknown_fields)]
-pub struct FileRequirement {
-    pub path: String,
-    pub create_if_not_exists: Option<bool>,
 }
 
 /// Schema for Tasks in the Roxfile
@@ -241,8 +162,6 @@ pub struct Pipeline {
 #[derive(Deserialize, Debug, Default, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct RoxFile {
-    pub version_requirements: Option<Vec<VersionRequirement>>,
-    pub file_requirements: Option<Vec<FileRequirement>>,
     pub tasks: Vec<Task>,
     pub pipelines: Option<Vec<Pipeline>>,
     pub templates: Option<Vec<Template>>,
@@ -260,13 +179,6 @@ impl Validate for RoxFile {
         if let Some(templates) = &self.templates {
             for template in templates {
                 template.validate()?
-            }
-        }
-
-        // Version Requirement Validation
-        if let Some(version_requirements) = &self.version_requirements {
-            for requirement in version_requirements {
-                requirement.validate()?
             }
         }
 

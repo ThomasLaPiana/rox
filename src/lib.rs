@@ -1,11 +1,9 @@
 mod cli;
 mod execution;
-mod file_requirements;
 mod model_injection;
 pub mod models;
 mod output;
 mod utils;
-mod version_requirements;
 
 use crate::cli::{cli_builder, construct_cli};
 use crate::execution::{execute_stages, execute_tasks};
@@ -50,23 +48,6 @@ pub fn rox() -> RoxResult<()> {
     let pipelines = inject_pipeline_metadata(roxfile.pipelines);
     let cli = construct_cli(&tasks, &pipelines);
     let cli_matches = cli.get_matches();
-
-    // Run File and Version checks
-    if !cli_matches.get_flag("skip-checks") {
-        // Check Versions
-        if roxfile.version_requirements.is_some() {
-            for version_check in roxfile.version_requirements.into_iter().flatten() {
-                version_requirements::check_version(version_check);
-            }
-        }
-
-        // Check Files
-        if roxfile.file_requirements.is_some() {
-            for requirement in roxfile.file_requirements.into_iter().flatten() {
-                file_requirements::handle_file_requirement(requirement);
-            }
-        }
-    }
 
     // Build Hashmaps for Tasks, Templates and Pipelines
     let template_map: HashMap<String, models::Template> = std::collections::HashMap::from_iter(

@@ -1,14 +1,3 @@
-version_requirements:
-  - command: "cargo nextest --version"
-    minimum_version: "0.9.0"
-    split: true
-
-file_requirements:
-  - path: "Cargo.toml"
-
-  - path: ".env"
-    create_if_not_exists: true
-
 templates:
   - name: docker_build
     command: "docker build {path} -t rox:{image_tag}"
