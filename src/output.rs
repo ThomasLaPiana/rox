@@ -86,14 +86,17 @@ pub fn display_execution_results(results: &AllResults) {
 pub fn display_docs(docs: &Docs) {
     match docs.kind {
         DocsKind::Markdown => {
-            let contents = std::fs::read_to_string(&docs.path).unwrap();
-            let mut skin = MadSkin::default();
-            println!("{}", skin.term_text(&contents));
+            let markdown = std::fs::read_to_string(&docs.path).unwrap();
+            let skin = MadSkin::default();
+            println!("{}", skin.term_text(&markdown));
         }
         DocsKind::Text => {
             let contents = std::fs::read_to_string(&docs.path).unwrap();
             println!("{}", contents);
         }
-        DocsKind::URL => webbrowser::open(&docs.path).unwrap(),
+        DocsKind::URL => {
+            println!("> Opening '{}' in your browser...", docs.path);
+            webbrowser::open(&docs.path).unwrap()
+        }
     }
 }
