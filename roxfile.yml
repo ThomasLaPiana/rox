@@ -1,3 +1,9 @@
+docs:
+  - name: "development"
+    description: "Development-related documentation"
+    kind: markdown
+    path: "docs/dev_docs.md"
+
 templates:
   - name: docker_build
     command: "docker build {path} -t rox:{image_tag}"

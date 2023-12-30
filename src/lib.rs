@@ -46,7 +46,8 @@ pub fn rox() -> RoxResult<()> {
     // Build & Generate the CLI based on the loaded Roxfile
     let tasks = inject_task_metadata(roxfile.tasks, &file_path);
     let pipelines = inject_pipeline_metadata(roxfile.pipelines);
-    let cli = construct_cli(&tasks, &pipelines);
+    let docs = roxfile.docs;
+    let cli = construct_cli(&tasks, &pipelines, &docs);
     let cli_matches = cli.get_matches();
 
     // Build Hashmaps for Tasks, Templates and Pipelines
@@ -68,24 +69,33 @@ pub fn rox() -> RoxResult<()> {
             })
             .map(|task| (task.name.to_owned(), task)),
     );
-    let pipeline_map: HashMap<String, models::Pipeline> = std::collections::HashMap::from_iter(
-        pipelines
-            .into_iter()
-            .flatten()
-            .map(|pipeline| (pipeline.name.to_owned(), pipeline)),
-    );
+
     // Deconstruct the CLI commands and get the Pipeline object that was called
     let (_, args) = cli_matches.subcommand().unwrap();
     let subcommand_name = args.subcommand_name().unwrap_or("default");
 
     // Execute the Task(s)
     let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
+        "docs" => {
+            let docs_map: HashMap<String, models::Docs> = std::collections::HashMap::from_iter(
+                docs.into_iter().map(|doc| (doc.name.to_owned(), doc)),
+            );
+            output::display_docs(docs_map.get(subcommand_name).unwrap());
+            std::process::exit(0);
+        }
         "logs" => {
             let number = args.get_one::<i8>("number").unwrap();
             output::display_logs(number);
             std::process::exit(0);
         }
         "pl" => {
+            let pipeline_map: HashMap<String, models::Pipeline> =
+                std::collections::HashMap::from_iter(
+                    pipelines
+                        .into_iter()
+                        .flatten()
+                        .map(|pipeline| (pipeline.name.to_owned(), pipeline)),
+                );
             let parallel = args.get_flag("parallel");
             let execution_results = execute_stages(
                 &pipeline_map.get(subcommand_name).unwrap().stages,

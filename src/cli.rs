@@ -1,9 +1,17 @@
-use crate::models::{Pipeline, Task};
+use crate::models::{Docs, Pipeline, Task};
 use clap::{crate_version, Arg, ArgAction, Command};
 
 /// Dyanmically construct the CLI from the Roxfile
-pub fn construct_cli(tasks: &[Task], pipelines: &Option<Vec<Pipeline>>) -> clap::Command {
+pub fn construct_cli(
+    tasks: &[Task],
+    pipelines: &Option<Vec<Pipeline>>,
+    docs: &[Docs],
+) -> clap::Command {
     let mut cli = cli_builder();
+
+    // Docs
+    let docs_subcommands = build_docs_subcommands(docs);
+    cli = cli.subcommands(vec![docs_subcommands]);
 
     // Tasks
     let task_subcommands = build_task_subcommands(tasks);
@@ -25,21 +33,12 @@ pub fn cli_builder() -> Command {
         .arg_required_else_help(true)
         .allow_external_subcommands(true)
         // TODO: Add a "watch" flag to run the command on file changes to a path?
-        // TODO: Add the option to log the command outputs into a file?
         .arg(
             Arg::new("roxfile")
                 .long("file")
                 .short('f')
                 .default_value("roxfile.yml")
                 .help("Path to a Roxfile"),
-        )
-        .arg(
-            Arg::new("skip-checks")
-                .long("skip-checks")
-                .short('s')
-                .required(false)
-                .action(ArgAction::SetTrue)
-                .help("Skip the version and file requirement checks."),
         )
         .subcommand(
             Command::new("logs")
@@ -53,6 +52,18 @@ pub fn cli_builder() -> Command {
                         .default_value("1"),
                 ),
         )
+}
+
+pub fn build_docs_subcommands(docs: &[Docs]) -> Command {
+    let subcommands: Vec<Command> = docs
+        .iter()
+        .map(|doc| Command::new(&doc.name).about(doc.description.clone()))
+        .collect();
+
+    Command::new("docs")
+        .about("Display various kinds of documentation.")
+        .arg_required_else_help(true)
+        .subcommands(subcommands)
 }
 
 /// Build the `task` subcommand with individual tasks nested as subcommands
