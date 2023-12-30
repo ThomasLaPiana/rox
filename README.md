@@ -9,7 +9,7 @@ Rox gives you the ability to build your own devtools CLI using YAML files. Tasks
 
 The subcommands and their help messages are automatically populated at runtime from the `name` and `description` of each `task` or `pipeline`.
 
-See [gameslog](https://github.com/ThomasLaPiana/gameslog-rs) for an example of usage in a real project.
+See [synthesizer](https://github.com/ThomasLaPiana/synthesizer) for an example of usage in a real project.
 
 ## Table of Contents
 
@@ -17,8 +17,6 @@ See [gameslog](https://github.com/ThomasLaPiana/gameslog-rs) for an example of u
 - [Video Walkthrough](#video-walkthrough)
 - [Installation](#installation)
 - [Roxfile Syntax](#roxfile-syntax)
-  - [Version Requirements](#version-requirements)
-  - [File Requirements](#file-requirements)
   - [Templates](#templates)
   - [Tasks](#tasks)
   - [Pipelines](#pipelines)
@@ -48,34 +46,6 @@ Rox can be installed via binaries provided with each release [here](https://gith
 ## Roxfile Syntax
 
 Rox requires a `YAML` file with the correct format and syntax to be parsed into a CLI. This file is expected to be at `./roxfile.yml` by default but that can be overriden with the `-f` flag at runtime.
-
-### Version Requirements
-
-Version Requirements are used to ensure that any required CLI tool matches your specified version requirements.
-
-```yaml
-version_requirements:
-  - command: "docker version --format {{.Client.Version}}" # Output: 20.10.23
-    minimum_version: "20.10.7"
-    maximum_version: "21.0.0"
-
-  - command: "python --version" # Output: Python 3.9.13
-    # Splits on spaces and grabs the last output token as the Version
-    split: true 
-    minimum_version: "3.8"
-```
-
-### File Requirements
-
-File Requirements ensure that certain expected files are present.
-
-```yaml
-file_requirements:
-  - path: "Cargo.toml" 
-  
-  - path: ".env"
-    create_if_not_exists: true # Create the file if it doesn't exist, as opposed to throwing an error
-```
 
 ### Templates
 
