@@ -17,6 +17,7 @@ See [synthesizer](https://github.com/ThomasLaPiana/synthesizer) for an example o
 - [Video Walkthrough](#video-walkthrough)
 - [Installation](#installation)
 - [Roxfile Syntax](#roxfile-syntax)
+  - [Docs](#docs)
   - [Templates](#templates)
   - [Tasks](#tasks)
   - [Pipelines](#pipelines)
@@ -46,6 +47,22 @@ Rox can be installed via binaries provided with each release [here](https://gith
 ## Roxfile Syntax
 
 Rox requires a `YAML` file with the correct format and syntax to be parsed into a CLI. This file is expected to be at `./roxfile.yml` by default but that can be overriden with the `-f` flag at runtime.
+
+### Docs
+
+Specifying `docs` within your `roxfile` allows you to keep track of various documentation for your project, with multiple supported formats usable via the `kind` field. The supported values are as follows:
+
+- url -> Opens a webbrowser pointed at the `URL` provided in the `path`
+- markdown -> Opens the file at `path` in a special in-terminal Markdown viewer. This allows the developer to navigate around a Markdown document without leaving the terminal.
+- text -> Prints a text file to the terminal.
+
+```yaml
+docs:
+  - name: testing
+    description: Docs around testing
+    kind: markdown
+    path: docs/testing.md
+```
 
 ### Templates
 

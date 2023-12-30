@@ -53,7 +53,6 @@ fn run_app(docs: &str) -> Result<(), Error> {
     queue!(w, Hide)?; // hiding the cursor
 
     let markdown = format!("{}\n{}", KEYBINDINGS, docs);
-    // Handle the document
     let mut view = MadView::from(markdown, view_area(), skin);
     loop {
         view.write_on(&mut w)?;

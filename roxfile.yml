@@ -11,7 +11,7 @@ docs:
 
   - name: "text"
     description: "Development-related documentation"
-    kind: markdown
+    kind: text 
     path: "docs/dev_docs.txt"
 
   - name: "url"
