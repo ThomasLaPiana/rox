@@ -1,4 +1,5 @@
 mod cli;
+mod docs;
 mod execution;
 mod model_injection;
 pub mod models;
@@ -78,9 +79,11 @@ pub fn rox() -> RoxResult<()> {
     let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
         "docs" => {
             let docs_map: HashMap<String, models::Docs> = std::collections::HashMap::from_iter(
-                docs.into_iter().map(|doc| (doc.name.to_owned(), doc)),
+                docs.into_iter()
+                    .flatten()
+                    .map(|doc| (doc.name.to_owned(), doc)),
             );
-            output::display_docs(docs_map.get(subcommand_name).unwrap());
+            docs::display_docs(docs_map.get(subcommand_name).unwrap());
             std::process::exit(0);
         }
         "logs" => {

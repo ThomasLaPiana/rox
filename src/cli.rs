@@ -5,13 +5,15 @@ use clap::{crate_version, Arg, ArgAction, Command};
 pub fn construct_cli(
     tasks: &[Task],
     pipelines: &Option<Vec<Pipeline>>,
-    docs: &[Docs],
+    docs: &Option<Vec<Docs>>,
 ) -> clap::Command {
     let mut cli = cli_builder();
 
     // Docs
-    let docs_subcommands = build_docs_subcommands(docs);
-    cli = cli.subcommands(vec![docs_subcommands]);
+    if let Some(docs) = docs {
+        let docs_subcommands = build_docs_subcommands(docs);
+        cli = cli.subcommands(vec![docs_subcommands]);
+    }
 
     // Tasks
     let task_subcommands = build_task_subcommands(tasks);
@@ -57,7 +59,7 @@ pub fn cli_builder() -> Command {
 pub fn build_docs_subcommands(docs: &[Docs]) -> Command {
     let subcommands: Vec<Command> = docs
         .iter()
-        .map(|doc| Command::new(&doc.name).about(doc.description.clone()))
+        .map(|doc| Command::new(&doc.name).about(doc.description.clone().unwrap_or_default()))
         .collect();
 
     Command::new("docs")

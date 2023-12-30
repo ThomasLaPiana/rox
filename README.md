@@ -26,12 +26,12 @@ See [synthesizer](https://github.com/ThomasLaPiana/synthesizer) for an example o
 
 Rox was created for the purpose of making building and developing applications easier. It is designed to focus on extensiblity, performance, and documentation. Here are a few of the key features that help Rox achieve that goal:
 
-- __Dynamically Generated CLI__: Rox's tasks and pipelines are dynamically added as subcommands to the CLI at runtime. Configuration is handled entirely in YAML files.
-- __Powerful Primitives__: Using a combination of Rox's primitives (`Tasks`, `Pipelines` and `Templates`) it is possible to handle virtually any use-case with elegance and minimal boilerplate.
-- __Documentation as a First-Class Feature__: Names and descriptions are automatically injected into the CLI at runtime, so your `help` command is always accurate. This helps developers understand what various tasks and pipelines do without needing to dive into the code.
-- __Performant__: Minimal overhead and native executables for a variety of architectures and operating systems.
-- __Efficient__: By utilizing pipeline stages and parallel execution, developers are empowered to make use of multi-core machines to speed up build and development tasks.
-- __User-Friendly__: Task results are shown to the user in an easy-to-consume table format along with useful metadata. This makes debugging easier, and shows potential bottlenecks in build steps.
+- **Dynamically Generated CLI**: Rox's tasks and pipelines are dynamically added as subcommands to the CLI at runtime. Configuration is handled entirely in YAML files.
+- **Primitives**: Using a combination of Rox's primitives (`Tasks`, `Pipelines` and `Templates`) it is possible to handle virtually any use-case with elegance and minimal boilerplate.
+- **Documentation as a First-Class Feature**: Names and descriptions are automatically injected into the CLI at runtime, so your `help` command is always accurate. This helps developers understand what various tasks and pipelines do without needing to dive into the code.
+- **Performant**: Minimal overhead and native executables for a variety of architectures and operating systems.
+- **Efficient**: By utilizing pipeline stages and parallel execution, developers are empowered to make use of multi-core machines to speed up build and development tasks.
+- **User-Friendly**: Task results are shown to the user in an easy-to-consume table format along with useful metadata. This makes debugging easier, and shows potential bottlenecks in build steps.
 
 ## Video Walkthrough
 

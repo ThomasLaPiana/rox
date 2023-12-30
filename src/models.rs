@@ -36,7 +36,7 @@ pub enum DocsKind {
 #[derive(Deserialize, Debug, Clone)]
 pub struct Docs {
     pub name: String,
-    pub description: String,
+    pub description: Option<String>,
     pub kind: DocsKind,
     pub path: String,
 }
@@ -178,7 +178,7 @@ pub struct Pipeline {
 #[derive(Deserialize, Debug, Default, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct RoxFile {
-    pub docs: Vec<Docs>,
+    pub docs: Option<Vec<Docs>>,
     pub tasks: Vec<Task>,
     pub pipelines: Option<Vec<Pipeline>>,
     pub templates: Option<Vec<Template>>,
