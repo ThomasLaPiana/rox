@@ -30,7 +30,7 @@ fn get_filepath_arg_value() -> String {
 }
 
 /// Entrypoint for the Crate CLI
-pub fn rox() -> RoxResult<()> {
+pub async fn rox() -> RoxResult<()> {
     let start = std::time::Instant::now();
     let execution_start = chrono::Utc::now().to_rfc3339();
 
@@ -94,7 +94,7 @@ pub fn rox() -> RoxResult<()> {
         }
         "ci" => {
             assert!(ci.is_some());
-            output::display_ci_status(ci.unwrap());
+            output::display_ci_status(ci.unwrap()).await;
             std::process::exit(0);
         }
         "pl" => {
