@@ -1,4 +1,4 @@
-use crate::models::{Docs, Pipeline, Task};
+use crate::models::{CiInfo, Docs, Pipeline, Task};
 use clap::{crate_version, Arg, ArgAction, Command};
 
 /// Dyanmically construct the CLI from the Roxfile
@@ -6,8 +6,14 @@ pub fn construct_cli(
     tasks: &[Task],
     pipelines: &Option<Vec<Pipeline>>,
     docs: &Option<Vec<Docs>>,
+    ci: &Option<CiInfo>,
 ) -> clap::Command {
     let mut cli = cli_builder(true);
+
+    // CI
+    if ci.is_some() {
+        cli = cli.subcommand(Command::new("ci").about("View CI pipeline information."));
+    }
 
     // Docs
     if let Some(docs) = docs {

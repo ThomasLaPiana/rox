@@ -5,6 +5,14 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CiInfo {
+    pub provider: String,
+    pub repo_owner: String,
+    pub repo_name: String,
+    pub token_env_var: String,
+}
+
 /// Format for completed executions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AllResults {
@@ -178,6 +186,7 @@ pub struct Pipeline {
 #[derive(Deserialize, Debug, Default, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct RoxFile {
+    pub ci: Option<CiInfo>,
     pub docs: Option<Vec<Docs>>,
     pub tasks: Vec<Task>,
     pub pipelines: Option<Vec<Pipeline>>,

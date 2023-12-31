@@ -1,6 +1,7 @@
-use crate::models::{AllResults, PassFail};
+use crate::models::{AllResults, CiInfo, PassFail};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
 use colored::Colorize;
+use octocrab;
 
 const LOG_DIR: &str = ".rox";
 
@@ -80,4 +81,13 @@ pub fn display_execution_results(results: &AllResults) {
             .bold(true),
     )
     .is_ok());
+}
+
+pub fn display_ci_status(ci_info: CiInfo) {
+    let branch = "add-ci-support";
+    let workflows = octocrab::instance()
+        .workflows(ci_info.repo_owner, ci_info.repo_name)
+        .list_all_runs()
+        .branch(branch);
+    todo!()
 }

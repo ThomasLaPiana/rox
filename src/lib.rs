@@ -48,7 +48,8 @@ pub fn rox() -> RoxResult<()> {
     let tasks = inject_task_metadata(roxfile.tasks, &file_path);
     let pipelines = inject_pipeline_metadata(roxfile.pipelines);
     let docs = roxfile.docs;
-    let cli = construct_cli(&tasks, &pipelines, &docs);
+    let ci = roxfile.ci;
+    let cli = construct_cli(&tasks, &pipelines, &docs, &ci);
     let cli_matches = cli.get_matches();
 
     // Build Hashmaps for Tasks, Templates and Pipelines
@@ -89,6 +90,11 @@ pub fn rox() -> RoxResult<()> {
         "logs" => {
             let number = args.get_one::<i8>("number").unwrap();
             output::display_logs(number);
+            std::process::exit(0);
+        }
+        "ci" => {
+            assert!(ci.is_some());
+            output::display_ci_status(ci.unwrap());
             std::process::exit(0);
         }
         "pl" => {
