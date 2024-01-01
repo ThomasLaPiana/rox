@@ -7,10 +7,46 @@ use git2::Repository;
 use octocrab::models::workflows::Conclusion;
 use octocrab::params::workflows::Filter;
 
+pub enum StepStatus {
+    Success,
+    Failed,
+    Skipped,
+    InProgress,
+    Cancelled,
+    Other,
+}
+
+impl std::fmt::Display for StepStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let message = match self {
+            StepStatus::Success => "Success",
+            StepStatus::Failed => "Failed",
+            StepStatus::Skipped => "Skipped",
+            StepStatus::InProgress => "In Progress",
+            StepStatus::Cancelled => "Cancelled",
+            StepStatus::Other => "Other",
+        };
+        write!(f, "{}", message)
+    }
+}
+
+/// Convert the OctoCrab Conclusion enum to a StepStatus enum
+/// for more user-friendly messaging.
+pub fn step_conclusion_lookup(conclusion: &Conclusion) -> StepStatus {
+    match conclusion {
+        Conclusion::Success => StepStatus::Success,
+        Conclusion::Failure | Conclusion::TimedOut => StepStatus::Failed,
+        Conclusion::Skipped => StepStatus::Skipped,
+        Conclusion::Cancelled => StepStatus::Cancelled,
+        Conclusion::ActionRequired | Conclusion::Neutral => StepStatus::Other,
+        _ => StepStatus::InProgress,
+    }
+}
+
 pub struct RunResult {
     name: String,
     job: String,
-    status: Conclusion,
+    status: StepStatus,
     started_at: Option<DateTime<Utc>>,
     ended_at: Option<DateTime<Utc>>,
 }
@@ -33,16 +69,19 @@ pub fn display_ci_results(results: &[RunResult]) {
     let mut table = Vec::new();
 
     results.iter().for_each(|result| {
+        // Convert the StepStatus enum to a string with the correct color
+        let status_string = result.status.to_string();
         let status = match result.status {
-            Conclusion::Success => "Success"
+            StepStatus::Success => "Success"
                 .to_string()
                 .green()
                 .cell()
                 .justify(Justify::Center),
-            Conclusion::Failure => "Failure".to_string().red().cell().justify(Justify::Center),
-            _ => "Other".to_string().red().cell().justify(Justify::Center),
+            StepStatus::Failed => status_string.red().cell().justify(Justify::Center),
+            _ => status_string.yellow().cell().justify(Justify::Center),
         };
 
+        // Add a row to the table
         table.push(vec![
             result.name.to_owned().cell(),
             result.job.clone().cell().justify(Justify::Center),
@@ -103,7 +142,11 @@ pub async fn display_ci_status(ci_info: CiInfo) {
         let steps = job.steps.into_iter().map(|step| RunResult {
             name: step.name,
             job: job.name.clone(),
-            status: step.conclusion.unwrap(),
+            status: if step.conclusion.is_none() {
+                StepStatus::InProgress
+            } else {
+                step_conclusion_lookup(step.conclusion.as_ref().unwrap())
+            },
             started_at: step.started_at,
             ended_at: step.completed_at,
         });

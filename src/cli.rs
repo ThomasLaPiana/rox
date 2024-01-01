@@ -12,6 +12,7 @@ pub fn construct_cli(
 
     // CI
     if ci.is_some() {
+        // TODO: Add a flag to only show failures
         cli = cli.subcommand(Command::new("ci").about("View CI pipeline information."));
     }
 
