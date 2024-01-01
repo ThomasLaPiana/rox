@@ -1,3 +1,4 @@
+mod ci;
 mod cli;
 mod docs;
 mod execution;
@@ -94,7 +95,7 @@ pub async fn rox() -> RoxResult<()> {
         }
         "ci" => {
             assert!(ci.is_some());
-            output::display_ci_status(ci.unwrap()).await;
+            ci::display_ci_status(ci.unwrap()).await;
             std::process::exit(0);
         }
         "pl" => {

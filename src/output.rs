@@ -1,8 +1,6 @@
-use crate::models::{AllResults, CiInfo, PassFail};
+use crate::models::{AllResults, PassFail};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
 use colored::Colorize;
-use git2::Repository;
-use octocrab::params::workflows::Filter;
 
 const LOG_DIR: &str = ".rox";
 
@@ -82,55 +80,4 @@ pub fn display_execution_results(results: &AllResults) {
             .bold(true),
     )
     .is_ok());
-}
-
-/// Show the most recent CI workflow
-pub async fn display_ci_status(ci_info: CiInfo) {
-    let repo = Repository::open_from_env().unwrap();
-    let head = repo.head().unwrap();
-    assert!(head.is_branch());
-    let branch = head.name().unwrap().split('/').last().unwrap();
-    println!("> Getting CI status for branch: {}", branch);
-
-    let instance = octocrab::instance();
-    let octo_instance = instance.workflows(ci_info.repo_owner, ci_info.repo_name);
-
-    let workflow = octo_instance
-        .list_all_runs()
-        .page(1u32)
-        .per_page(1)
-        .branch(branch)
-        .send()
-        .await
-        .unwrap()
-        .into_iter()
-        .next()
-        .unwrap();
-
-    let jobs = octo_instance
-        .list_jobs(workflow.id)
-        // Optional Parameters
-        .per_page(100)
-        .page(1u8)
-        .filter(Filter::All)
-        // Send the request
-        .send()
-        .await
-        .unwrap();
-
-    jobs.into_iter().for_each(|job| {
-        println!(
-            "{} | {} | {:?} | {}",
-            job.id, job.name, job.status, job.started_at
-        );
-
-        job.steps.into_iter().for_each(|step| {
-            println!(
-                "{} | {:?} | {}",
-                step.name,
-                step.status,
-                step.started_at.unwrap()
-            )
-        })
-    });
 }
