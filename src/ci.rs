@@ -114,13 +114,17 @@ pub async fn display_ci_status(ci_info: CiInfo) {
 
     // Build an Authenticated GitHub Client
     let token = std::env::var(ci_info.token_env_var).expect("Failed to get token from env var!");
-    let octo_builder = octocrab::OctocrabBuilder::new()
+    let octo_instance = octocrab::OctocrabBuilder::new()
         .personal_token(token)
         .build()
         .unwrap();
-    let octo_instance = octocrab::initialise(octo_builder);
-    let workflow_instance = octo_instance.workflows(ci_info.repo_owner, ci_info.repo_name);
 
+    // Verify that the client is authorized
+    if octo_instance.current().user().await.is_err() {
+        panic!("GitHub client is not authorized!");
+    }
+
+    let workflow_instance = octo_instance.workflows(ci_info.repo_owner, ci_info.repo_name);
     let workflow = workflow_instance
         .list_all_runs()
         .page(1u32)
