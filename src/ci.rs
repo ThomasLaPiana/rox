@@ -1,5 +1,4 @@
 use crate::models::CiInfo;
-use chrono;
 use chrono::{DateTime, Utc};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
 use colored::Colorize;
@@ -65,7 +64,7 @@ impl RunResult {
 }
 
 /// Print the execution results in a pretty table format
-pub fn display_ci_results(results: &[RunResult]) {
+pub fn display_results_table(results: &[RunResult]) {
     let mut table = Vec::new();
 
     results.iter().for_each(|result| {
@@ -106,30 +105,35 @@ pub fn display_ci_results(results: &[RunResult]) {
 
 /// Show the most recent CI workflow
 pub async fn display_ci_status(ci_info: CiInfo) {
+    // Configure Git and retrieve repo info
     let repo = Repository::open_from_env().unwrap();
     let head = repo.head().unwrap();
     assert!(head.is_branch());
     let branch = head.name().unwrap().split('/').last().unwrap();
     println!("> Getting CI status for branch: {}", branch);
 
-    let instance = octocrab::instance();
-    let octo_instance = instance.workflows(ci_info.repo_owner, ci_info.repo_name);
+    // Build an Authenticated GitHub Client
+    let token = std::env::var(ci_info.token_env_var).expect("Failed to get token from env var!");
+    let octo_builder = octocrab::OctocrabBuilder::default()
+        .personal_token(token)
+        .build()
+        .unwrap();
+    let octo_instance = octocrab::initialise(octo_builder);
+    let workflow_instance = octo_instance.workflows(ci_info.repo_owner, ci_info.repo_name);
 
-    let workflow = octo_instance
+    let workflow = workflow_instance
         .list_all_runs()
         .page(1u32)
         .per_page(1)
         .branch(branch)
         .send()
         .await
-        .unwrap()
+        .expect("Failed to retrieve workflow data!")
         .into_iter()
         .next()
         .unwrap();
 
-    let mut results = Vec::new();
-
-    let jobs = octo_instance
+    let jobs = workflow_instance
         .list_jobs(workflow.id)
         .per_page(100)
         .page(1u8)
@@ -138,6 +142,7 @@ pub async fn display_ci_status(ci_info: CiInfo) {
         .await
         .unwrap();
 
+    let mut results = Vec::new();
     jobs.into_iter().for_each(|job| {
         let steps = job.steps.into_iter().map(|step| RunResult {
             name: step.name,
@@ -153,5 +158,5 @@ pub async fn display_ci_status(ci_info: CiInfo) {
         results.extend(steps);
     });
 
-    display_ci_results(&results);
+    display_results_table(&results);
 }
