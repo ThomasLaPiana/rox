@@ -2,7 +2,7 @@
 name = "rox-cli"
 authors = ["Thomas La Piana"]
 description = "Composable build tool inspired by Make"
-version = "0.8.0"
+version = "0.8.1"
 edition = "2021"
 repository = "https://github.com/ThomasLaPiana/rox"
 license = "MIT OR Apache-2.0"
