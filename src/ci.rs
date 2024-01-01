@@ -96,7 +96,7 @@ pub fn display_results_table(results: &[RunResult]) {
                 "Name".yellow().cell().bold(true),
                 "Job".yellow().cell().bold(true),
                 "Status".yellow().cell().bold(true),
-                "Elapsed Time".yellow().cell().bold(true),
+                "Elapsed Time (sec)".yellow().cell().bold(true),
             ])
             .bold(true),
     )
@@ -137,30 +137,34 @@ pub async fn display_ci_status(ci_info: CiInfo) {
         .next()
         .unwrap();
 
-    let jobs = workflow_instance
+    let results: Vec<RunResult> = workflow_instance
         .list_jobs(workflow.id)
         .per_page(100)
         .page(1u8)
         .filter(Filter::All)
         .send()
         .await
-        .unwrap();
-
-    let mut results = Vec::new();
-    jobs.into_iter().for_each(|job| {
-        let steps = job.steps.into_iter().map(|step| RunResult {
-            name: step.name,
-            job: job.name.clone(),
-            status: if step.conclusion.is_none() {
-                StepStatus::InProgress
-            } else {
-                step_conclusion_lookup(step.conclusion.as_ref().unwrap())
-            },
-            started_at: step.started_at,
-            ended_at: step.completed_at,
-        });
-        results.extend(steps);
-    });
+        .unwrap()
+        .into_iter()
+        .flat_map(|job| {
+            let results: Vec<RunResult> = job
+                .steps
+                .into_iter()
+                .map(|step| RunResult {
+                    name: step.name,
+                    job: job.name.clone(),
+                    status: if step.conclusion.is_none() {
+                        StepStatus::InProgress
+                    } else {
+                        step_conclusion_lookup(step.conclusion.as_ref().unwrap())
+                    },
+                    started_at: step.started_at,
+                    ended_at: step.completed_at,
+                })
+                .collect();
+            results
+        })
+        .collect();
 
     display_results_table(&results);
 }
