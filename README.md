@@ -3,9 +3,9 @@
 ![crates.io](https://img.shields.io/crates/v/rox-cli.svg)
 [![CI Checks](https://github.com/ThomasLaPiana/rox/actions/workflows/checks.yml/badge.svg)](https://github.com/ThomasLaPiana/rox/actions/workflows/checks.yml)
 
-Hollistic developer experience tool inspired by [Nox](https://nox.thea.codes/en/stable/), Make & [cargo-make](https://github.com/sagiegurari/cargo-make)
+Rox is a robust developer workflow framework inspired by [Nox](https://nox.thea.codes/en/stable/), Make & [cargo-make](https://github.com/sagiegurari/cargo-make)
 
-Rox gives you the ability to build your own devtools CLI using YAML files. Tasks and Pipelines are dynamically added to the CLI as subcommands at runtime. The flexibility of `rox` intends to makes it easier for dev teams to standardize their workflows without writing endless "glue" scripts.
+Rox gives you the ability to build your own devtools CLI using YAML files, check CI pipeline statuses from your terminal, and even read documentation. Tasks and Pipelines are dynamically added to the CLI as subcommands at runtime. The flexibility of `rox` intends to makes it easier for dev teams to standardize their workflows without writing endless "glue" scripts.
 
 The subcommands and their help messages are automatically populated at runtime from the `name` and `description` of each `task` or `pipeline`.
 
@@ -17,6 +17,7 @@ See [synthesizer](https://github.com/ThomasLaPiana/synthesizer) for an example o
 - [Video Walkthrough](#video-walkthrough)
 - [Installation](#installation)
 - [Roxfile Syntax](#roxfile-syntax)
+  - [CI](#ci)
   - [Docs](#docs)
   - [Templates](#templates)
   - [Tasks](#tasks)
@@ -47,6 +48,20 @@ Rox can be installed via binaries provided with each release [here](https://gith
 ## Roxfile Syntax
 
 Rox requires a `YAML` file with the correct format and syntax to be parsed into a CLI. This file is expected to be at `./roxfile.yml` by default but that can be overriden with the `-f` flag at runtime.
+
+### CI
+
+Rox allows developers to see CI pipeline results from their terminal with some minimal configuration.
+
+```yaml
+ci:
+  # The CI provider to use. Currently only GitHub Actions is supported.
+  provider: github_actions
+  repo_owner: ThomasLaPiana
+  repo_name: rox
+  # The name of the env var with the stored PAT (Personal Access Token)
+  token_env_var: GITHUB_TOKEN
+```
 
 ### Docs
 
@@ -127,16 +142,3 @@ pipelines:
 ### Putting it all together
 
 Now that we've seen each individual piece of the Rox puzzle, we can put them all together into a full `roxfile`. See the [example roxfile.yml](roxfile.yml) in this repo for a working example!
-
-## Releasing
-
-`Rox` is released by running `cargo release` locally.
-
-Steps to Release:
-
-1. Make sure that all desired changes are pushed up and merged to `main`
-1. `cargo install cargo-release` (if not already installed)
-1. `cargo release [major|minor|patch] --execute` - Updates the `Cargo.toml`, commits and pushes the change, and then publishes the crate to <crates.io>
-1. `cargo release tag --execute` - Creates a git tag with the same version as the `Cargo.toml`
-1. `cargo release push --execute` - Pushes the git tag
-1. Finally, a CI job is automatically triggered to build and upload the release assets

@@ -7,6 +7,11 @@ ci:
 
 # Add documentation to your Rox CLI
 docs:
+  - name: "release"
+    description: "Documentation around cutting releases"
+    kind: markdown
+    path: "docs/release.md"
+
   - name: "markdown"
     description: "Development-related documentation"
     # Markdown files are rendered in a special viewer within the terminal
