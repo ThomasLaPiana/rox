@@ -114,7 +114,7 @@ pub async fn display_ci_status(ci_info: CiInfo) {
 
     // Build an Authenticated GitHub Client
     let token = std::env::var(ci_info.token_env_var).expect("Failed to get token from env var!");
-    let octo_builder = octocrab::OctocrabBuilder::default()
+    let octo_builder = octocrab::OctocrabBuilder::new()
         .personal_token(token)
         .build()
         .unwrap();
