@@ -1,3 +1,4 @@
+mod ci;
 mod cli;
 mod docs;
 mod execution;
@@ -30,7 +31,7 @@ fn get_filepath_arg_value() -> String {
 }
 
 /// Entrypoint for the Crate CLI
-pub fn rox() -> RoxResult<()> {
+pub async fn rox() -> RoxResult<()> {
     let start = std::time::Instant::now();
     let execution_start = chrono::Utc::now().to_rfc3339();
 
@@ -48,7 +49,8 @@ pub fn rox() -> RoxResult<()> {
     let tasks = inject_task_metadata(roxfile.tasks, &file_path);
     let pipelines = inject_pipeline_metadata(roxfile.pipelines);
     let docs = roxfile.docs;
-    let cli = construct_cli(&tasks, &pipelines, &docs);
+    let ci = roxfile.ci;
+    let cli = construct_cli(&tasks, &pipelines, &docs, &ci);
     let cli_matches = cli.get_matches();
 
     // Build Hashmaps for Tasks, Templates and Pipelines
@@ -89,6 +91,11 @@ pub fn rox() -> RoxResult<()> {
         "logs" => {
             let number = args.get_one::<i8>("number").unwrap();
             output::display_logs(number);
+            std::process::exit(0);
+        }
+        "ci" => {
+            assert!(ci.is_some());
+            ci::display_ci_status(ci.unwrap()).await;
             std::process::exit(0);
         }
         "pl" => {

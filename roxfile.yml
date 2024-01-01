@@ -1,6 +1,20 @@
+ci:
+  # The CI provider to use. Currently only GitHub Actions is supported.
+  provider: github_actions
+  repo_owner: ThomasLaPiana
+  repo_name: rox
+  token_env_var: GITHUB_TOKEN
+
+# Add documentation to your Rox CLI
 docs:
+  - name: "release"
+    description: "Documentation around cutting releases"
+    kind: markdown
+    path: "docs/release.md"
+
   - name: "markdown"
     description: "Development-related documentation"
+    # Markdown files are rendered in a special viewer within the terminal
     kind: markdown
     path: "docs/dev_docs.md"
 
@@ -11,11 +25,13 @@ docs:
 
   - name: "text"
     description: "Development-related documentation"
+    # Text files are printed directly to stdout
     kind: text 
     path: "docs/dev_docs.txt"
 
   - name: "url"
     description: "Development-related documentation"
+    # URLs are opened in the default browser
     kind: url
     path: "http://google.com"
 

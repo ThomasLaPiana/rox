@@ -22,10 +22,13 @@ chrono = "0.4.31"
 clap = { version = "4.4.4", features = ["string", "cargo"] }
 cli-table = "0.4.7"
 colored = "2.0.4"
+git2 = "0.18.1"
+octocrab = "0.32.0"
 rayon = "1.8.0"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_yaml = "0.9.25"
 termimad = "0.26.1"
+tokio = { version = "1.35.1", features = ["tokio-macros", "full"] }
 webbrowser = "0.8.12"
 
 [dev-dependencies]
