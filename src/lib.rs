@@ -2,6 +2,7 @@ mod ci;
 mod cli;
 mod docs;
 mod execution;
+mod logs;
 mod model_injection;
 pub mod models;
 mod output;
@@ -90,7 +91,7 @@ pub async fn rox() -> RoxResult<()> {
         }
         "logs" => {
             let number = args.get_one::<i8>("number").unwrap();
-            output::display_logs(number);
+            logs::display_logs(number);
             std::process::exit(0);
         }
         "ci" => {
@@ -131,7 +132,7 @@ pub async fn rox() -> RoxResult<()> {
         results: results.into_iter().flatten().collect(),
     };
 
-    let log_path = output::write_logs(&results);
+    let log_path = logs::write_logs(&results);
     println!("> Log file written to: {}", log_path);
 
     output::display_execution_results(&results);

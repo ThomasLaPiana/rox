@@ -56,7 +56,6 @@ pub fn cli_builder(strict_subcommands: bool) -> Command {
                     Arg::new("number")
                         .help("The number of logs to view.")
                         .required(false)
-                        .short('n')
                         .value_parser(clap::value_parser!(i8))
                         .default_value("1"),
                 ),
