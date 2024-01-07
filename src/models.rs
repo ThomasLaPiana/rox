@@ -4,6 +4,7 @@ use crate::logs;
 use crate::model_injection::{
     inject_pipeline_metadata, inject_task_metadata, inject_template_values,
 };
+use crate::output;
 use crate::utils::{color_print, ColorEnum};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -31,6 +32,10 @@ impl JobResults {
     pub fn log_results(&self) {
         let log_path = logs::write_logs(self);
         println!("> Log file written to: {}", log_path);
+    }
+
+    pub fn display_results(&self) {
+        output::display_execution_results(self);
     }
 
     /// Triggers a non-zero exit if any job failed, otherwise passes.

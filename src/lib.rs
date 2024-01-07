@@ -11,7 +11,6 @@ mod utils;
 use crate::cli::{cli_builder, construct_cli};
 use crate::execution::{execute_stages, execute_tasks};
 use crate::models::JobResults;
-use crate::models::TaskResult;
 use std::collections::HashMap;
 use std::error::Error;
 
@@ -62,8 +61,8 @@ pub async fn rox() -> RoxResult<()> {
     let (_, args) = cli_matches.subcommand().unwrap();
     let subcommand_name = args.subcommand_name().unwrap_or("default");
 
-    // Execute the Task(s)
-    let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
+    // Execute the Command
+    match cli_matches.subcommand_name().unwrap() {
         "docs" => {
             let docs_map: HashMap<String, models::Docs> = std::collections::HashMap::from_iter(
                 roxfile
@@ -100,7 +99,14 @@ pub async fn rox() -> RoxResult<()> {
                 &task_map,
                 parallel,
             );
-            execution_results
+            let results = JobResults {
+                job_name: subcommand_name.to_string(),
+                execution_time: execution_start,
+                results: execution_results.into_iter().flatten().collect(),
+            };
+            results.log_results();
+            results.display_results();
+            results.check_results();
         }
         "task" => {
             let execution_results = vec![execute_tasks(
@@ -109,25 +115,23 @@ pub async fn rox() -> RoxResult<()> {
                 &task_map,
                 false,
             )];
-            execution_results
+            let results = JobResults {
+                job_name: subcommand_name.to_string(),
+                execution_time: execution_start,
+                results: execution_results.into_iter().flatten().collect(),
+            };
+            results.log_results();
+            results.display_results();
+            results.check_results();
         }
         _ => unreachable!("Invalid subcommand"),
     };
-    let results = JobResults {
-        job_name: subcommand_name.to_string(),
-        execution_time: execution_start,
-        results: results.into_iter().flatten().collect(),
-    };
 
-    results.log_results();
-
-    output::display_execution_results(&results);
     println!(
         "> Total elapsed time: {}s | {}ms",
         start.elapsed().as_secs(),
         start.elapsed().as_millis(),
     );
-    results.check_results();
 
     Ok(())
 }
