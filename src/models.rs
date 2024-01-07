@@ -1,7 +1,13 @@
 //! Contains the Structs for the Schema of the Roxfile
 //! as well as the validation logic.
+use crate::logs;
+use crate::model_injection::{
+    inject_pipeline_metadata, inject_task_metadata, inject_template_values,
+};
 use crate::utils::{color_print, ColorEnum};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 
@@ -15,10 +21,27 @@ pub struct CiInfo {
 
 /// Format for completed executions
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AllResults {
+pub struct JobResults {
     pub job_name: String,
     pub execution_time: String,
     pub results: Vec<TaskResult>,
+}
+
+impl JobResults {
+    pub fn log_results(&self) {
+        let log_path = logs::write_logs(self);
+        println!("> Log file written to: {}", log_path);
+    }
+
+    /// Triggers a non-zero exit if any job failed, otherwise passes.
+    pub fn check_results(&self) {
+        // TODO: Figure out a way to get this info without looping again
+        self.results.iter().for_each(|result| {
+            if result.result == PassFail::Fail {
+                std::process::exit(2)
+            }
+        });
+    }
 }
 
 /// Enum for task command status
@@ -194,20 +217,45 @@ pub struct RoxFile {
     pub additional_files: Option<Vec<String>>,
 }
 
-impl Validate for RoxFile {
-    fn validate(&self) -> Result<(), ValidationError> {
-        // Task Validation
-        for task in &self.tasks {
-            task.validate()?
-        }
+impl RoxFile {
+    /// Create a new instance of RoxFile from a file path and
+    /// run all additional validation and metadata injection.
+    pub fn build(file_path: &str) -> Result<Self> {
+        let file_string = std::fs::read_to_string(file_path)?;
+        let mut roxfile: RoxFile = serde_yaml::from_str(&file_string)?;
 
-        // Template Validation
-        if let Some(templates) = &self.templates {
-            for template in templates {
-                template.validate()?
-            }
-        }
+        // Templates
+        let _ = roxfile
+            .templates
+            .iter()
+            .flatten()
+            .try_for_each(|template| template.validate());
+        let template_map: HashMap<String, &Template> = std::collections::HashMap::from_iter(
+            roxfile
+                .templates
+                .as_deref()
+                .into_iter()
+                .flatten()
+                .map(|template| (template.name.to_owned(), template)),
+        );
 
-        Ok(())
+        // Tasks
+        let _ = roxfile.tasks.iter().try_for_each(|task| task.validate());
+        roxfile.tasks = inject_task_metadata(roxfile.tasks, file_path);
+        roxfile.tasks = roxfile
+            .tasks
+            .into_iter()
+            .map(|task| match task.uses.to_owned() {
+                Some(task_use) => {
+                    inject_template_values(task, template_map.get(&task_use).unwrap())
+                }
+                None => task,
+            })
+            .collect();
+
+        // Pipelines
+        roxfile.pipelines = inject_pipeline_metadata(roxfile.pipelines);
+
+        Ok(roxfile)
     }
 }

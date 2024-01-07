@@ -1,9 +1,9 @@
-use crate::models::{AllResults, PassFail};
+use crate::models::{JobResults, PassFail};
 use cli_table::{format::Justify, print_stdout, Cell, Style, Table};
 use colored::Colorize;
 
 /// Print the execution results in a pretty table format
-pub fn display_execution_results(results: &AllResults) {
+pub fn display_execution_results(results: &JobResults) {
     let mut table = Vec::new();
 
     for result in results.results.iter() {

@@ -1,4 +1,4 @@
-use crate::models::AllResults;
+use crate::models::JobResults;
 use crate::output::display_execution_results;
 
 const LOG_DIR: &str = ".rox";
@@ -12,7 +12,7 @@ pub fn display_logs(number: &i8) {
         .unwrap();
     filenames.sort();
 
-    let results: Vec<AllResults> = filenames
+    let results: Vec<JobResults> = filenames
         .iter()
         .rev()
         .take(*number as usize)
@@ -29,7 +29,7 @@ pub fn display_logs(number: &i8) {
 }
 
 /// Write the execution results to a log file
-pub fn write_logs(results: &AllResults) -> String {
+pub fn write_logs(results: &JobResults) -> String {
     let filename = format!("rox-{}.log.yaml", chrono::Utc::now().to_rfc3339());
     let filepath = format!("{}/{}", LOG_DIR, filename);
 

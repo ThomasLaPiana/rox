@@ -10,11 +10,8 @@ mod utils;
 
 use crate::cli::{cli_builder, construct_cli};
 use crate::execution::{execute_stages, execute_tasks};
-use crate::model_injection::{
-    inject_pipeline_metadata, inject_task_metadata, inject_template_values,
-};
-use crate::models::{AllResults, Validate};
-use crate::models::{PassFail, TaskResult};
+use crate::models::JobResults;
+use crate::models::TaskResult;
 use std::collections::HashMap;
 use std::error::Error;
 
@@ -42,35 +39,22 @@ pub async fn rox() -> RoxResult<()> {
 
     // Get the file arg from the CLI if set
     let file_path = get_filepath_arg_value();
-    let roxfile = utils::parse_file_contents(utils::load_file(&file_path));
-    roxfile.validate()?;
+    let roxfile = models::RoxFile::build(&file_path)?;
     utils::print_horizontal_rule();
 
     // Build & Generate the CLI based on the loaded Roxfile
-    let tasks = inject_task_metadata(roxfile.tasks, &file_path);
-    let pipelines = inject_pipeline_metadata(roxfile.pipelines);
-    let docs = roxfile.docs;
-    let ci = roxfile.ci;
-    let cli = construct_cli(&tasks, &pipelines, &docs, &ci);
+    let cli = construct_cli(
+        &roxfile.tasks,
+        &roxfile.pipelines,
+        &roxfile.docs,
+        &roxfile.ci,
+    );
     let cli_matches = cli.get_matches();
 
-    // Build Hashmaps for Tasks, Templates and Pipelines
-    let template_map: HashMap<String, models::Template> = std::collections::HashMap::from_iter(
-        roxfile
-            .templates
-            .into_iter()
-            .flatten()
-            .map(|template| (template.name.to_owned(), template)),
-    );
     let task_map: HashMap<String, models::Task> = std::collections::HashMap::from_iter(
-        tasks
+        roxfile
+            .tasks
             .into_iter()
-            .map(|task| match task.uses.to_owned() {
-                Some(task_use) => {
-                    inject_template_values(task, template_map.get(&task_use).unwrap())
-                }
-                None => task,
-            })
             .map(|task| (task.name.to_owned(), task)),
     );
 
@@ -82,7 +66,9 @@ pub async fn rox() -> RoxResult<()> {
     let results: Vec<Vec<TaskResult>> = match cli_matches.subcommand_name().unwrap() {
         "docs" => {
             let docs_map: HashMap<String, models::Docs> = std::collections::HashMap::from_iter(
-                docs.into_iter()
+                roxfile
+                    .docs
+                    .into_iter()
                     .flatten()
                     .map(|doc| (doc.name.to_owned(), doc)),
             );
@@ -95,14 +81,15 @@ pub async fn rox() -> RoxResult<()> {
             std::process::exit(0);
         }
         "ci" => {
-            assert!(ci.is_some());
-            ci::display_ci_status(ci.unwrap()).await;
+            assert!(roxfile.ci.is_some());
+            ci::display_ci_status(roxfile.ci.unwrap()).await;
             std::process::exit(0);
         }
         "pl" => {
             let pipeline_map: HashMap<String, models::Pipeline> =
                 std::collections::HashMap::from_iter(
-                    pipelines
+                    roxfile
+                        .pipelines
                         .into_iter()
                         .flatten()
                         .map(|pipeline| (pipeline.name.to_owned(), pipeline)),
@@ -126,14 +113,13 @@ pub async fn rox() -> RoxResult<()> {
         }
         _ => unreachable!("Invalid subcommand"),
     };
-    let results = AllResults {
+    let results = JobResults {
         job_name: subcommand_name.to_string(),
         execution_time: execution_start,
         results: results.into_iter().flatten().collect(),
     };
 
-    let log_path = logs::write_logs(&results);
-    println!("> Log file written to: {}", log_path);
+    results.log_results();
 
     output::display_execution_results(&results);
     println!(
@@ -141,17 +127,7 @@ pub async fn rox() -> RoxResult<()> {
         start.elapsed().as_secs(),
         start.elapsed().as_millis(),
     );
-    nonzero_exit_if_failure(&results);
+    results.check_results();
 
     Ok(())
-}
-
-/// Throw a non-zero exit if any Task(s) had a failing result
-pub fn nonzero_exit_if_failure(results: &AllResults) {
-    // TODO: Figure out a way to get this info without looping again
-    for result in results.results.iter() {
-        if result.result == PassFail::Fail {
-            std::process::exit(2)
-        }
-    }
 }
