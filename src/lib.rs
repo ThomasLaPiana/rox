@@ -1,16 +1,12 @@
-mod ci;
 mod cli;
-mod docs;
-mod execution;
-mod logs;
-mod model_injection;
 pub mod models;
-mod output;
+mod modules;
 mod utils;
 
 use crate::cli::{cli_builder, construct_cli};
-use crate::execution::{execute_stages, execute_tasks};
 use crate::models::JobResults;
+use crate::modules::execution::{execute_stages, execute_tasks};
+use crate::modules::{ci, docs, logs};
 use std::collections::HashMap;
 use std::error::Error;
 

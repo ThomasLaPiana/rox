@@ -1,10 +1,10 @@
 //! Contains the Structs for the Schema of the Roxfile
 //! as well as the validation logic.
 use crate::logs;
-use crate::model_injection::{
+use crate::modules::execution::model_injection::{
     inject_pipeline_metadata, inject_task_metadata, inject_template_values,
 };
-use crate::output;
+use crate::modules::execution::output;
 use crate::utils::{color_print, ColorEnum};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};

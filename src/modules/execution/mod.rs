@@ -1,3 +1,5 @@
+pub mod model_injection;
+pub mod output;
 use crate::models::{PassFail, Task, TaskResult};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use std::collections::HashMap;
