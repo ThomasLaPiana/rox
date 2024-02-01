@@ -22,7 +22,7 @@ pub fn display_logs(number: &i8) {
         })
         .collect();
 
-    for result in results.iter() {
+    for result in results.iter().rev() {
         println!("\n> {} | {}", result.job_name, result.execution_time);
         display_execution_results(result)
     }
