@@ -38,6 +38,7 @@ pub fn construct_cli(
 pub fn cli_builder(strict_subcommands: bool) -> Command {
     Command::new("rox")
         .about("Rox: The Robust Developer Experience CLI")
+        .next_display_order(None)
         .version(crate_version!())
         .arg_required_else_help(true)
         .allow_external_subcommands(!strict_subcommands)
@@ -70,6 +71,7 @@ pub fn build_docs_subcommands(docs: &[Docs]) -> Command {
 
     Command::new("docs")
         .about("Display various kinds of documentation.")
+        .next_display_order(None)
         .arg_required_else_help(true)
         .subcommands(subcommands)
 }
@@ -100,6 +102,7 @@ pub fn build_pipeline_subcommands(pipelines: &[Pipeline]) -> Command {
 
     Command::new("pl")
         .about("Pipelines composed of multiple tasks.")
+        .next_display_order(None)
         .long_about("Set(s) of task(s) composed into multiple stages.")
         .arg_required_else_help(true)
         .arg(

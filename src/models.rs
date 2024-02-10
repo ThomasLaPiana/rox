@@ -255,18 +255,6 @@ impl RoxFile {
             })
             .collect();
 
-        // Pipelines
-        if let Some(mut sorted_pipelines) = roxfile.pipelines {
-            sorted_pipelines.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
-            roxfile.pipelines = Some(sorted_pipelines)
-        }
-
-        // Docs
-        if let Some(mut sorted_docs) = roxfile.docs {
-            sorted_docs.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
-            roxfile.docs = Some(sorted_docs)
-        }
-
         Ok(roxfile)
     }
 }
