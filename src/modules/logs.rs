@@ -30,7 +30,7 @@ pub fn display_logs(number: &i8) {
 
 /// Write the execution results to a log file
 pub fn write_logs(results: &JobResults) -> String {
-    let filename = format!("rox-{}.log.yaml", chrono::Utc::now().to_rfc3339());
+    let filename = format!("rox-{}.log.yaml", results.execution_time);
     let filepath = format!("{}/{}", LOG_DIR, filename);
 
     // Make sure the log directory exists
