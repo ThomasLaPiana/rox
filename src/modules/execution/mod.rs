@@ -1,6 +1,6 @@
 pub mod model_injection;
 pub mod output;
-use crate::models::{PassFail, Task, TaskResult};
+use crate::models::{JobResults, PassFail, Pipeline, Task, TaskResult};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use std::collections::HashMap;
 use std::process::{Command, ExitStatus};
@@ -95,4 +95,33 @@ pub fn execute_stages(
         .collect();
     stage_results
     // TODO: Return a JobResults here
+}
+
+/// Execute Pipeline
+pub fn execute_pipeline(pipeline: Pipeline, task_map: &HashMap<String, Task>, parallel: bool) {
+    let execution_start = chrono::Utc::now().to_rfc3339();
+    let execution_results = execute_stages(&pipeline.stages, task_map, parallel);
+    let results = JobResults {
+        job_name: pipeline.name.to_string(),
+        execution_time: execution_start,
+        results: execution_results.into_iter().flatten().collect(),
+    };
+    results.log_results();
+    results.display_results();
+    results.check_results();
+}
+
+/// Execute a single user-defined Task
+pub fn execute_task(task: Task) {
+    let execution_start = chrono::Utc::now().to_rfc3339();
+    let execution_results: TaskResult = run_task(&task, 0);
+    let results = JobResults {
+        job_name: task.name.to_string(),
+        execution_time: execution_start,
+        results: vec![execution_results],
+    };
+
+    results.log_results();
+    results.display_results();
+    results.check_results();
 }

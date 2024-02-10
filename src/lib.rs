@@ -4,8 +4,7 @@ mod modules;
 mod utils;
 
 use crate::cli::{cli_builder, construct_cli};
-use crate::models::JobResults;
-use crate::modules::execution::{execute_stages, execute_tasks};
+use crate::modules::execution::{execute_pipeline, execute_task};
 use crate::modules::{ci, docs, logs};
 use std::collections::HashMap;
 use std::error::Error;
@@ -26,7 +25,6 @@ fn get_filepath_arg_value() -> String {
 /// Entrypoint for the Crate CLI
 pub async fn rox() -> RoxResult<()> {
     let start = std::time::Instant::now();
-    let execution_start = chrono::Utc::now().to_rfc3339();
 
     // NOTE: Due to the dynamically generated nature of the CLI,
     // It is required to parse the CLI matches twice. Once to get
@@ -53,73 +51,42 @@ pub async fn rox() -> RoxResult<()> {
             .map(|task| (task.name.to_owned(), task)),
     );
 
-    // Deconstruct the CLI commands and get the Pipeline object that was called
     let (_, args) = cli_matches.subcommand().unwrap();
     let subcommand_name = args.subcommand_name().unwrap_or("default");
 
     // Execute the Command
-    match cli_matches.subcommand_name().unwrap() {
-        "docs" => {
-            let docs_map: HashMap<String, models::Docs> = std::collections::HashMap::from_iter(
-                roxfile
-                    .docs
-                    .into_iter()
-                    .flatten()
-                    .map(|doc| (doc.name.to_owned(), doc)),
-            );
-            docs::display_docs(docs_map.get(subcommand_name).unwrap());
+    match cli_matches.subcommand_name() {
+        Some("docs") => {
+            let documentation = roxfile
+                .docs
+                .iter()
+                .flatten()
+                .find(|doc| doc.name == subcommand_name)
+                .unwrap();
+            docs::display_docs(documentation);
             std::process::exit(0);
         }
-        "logs" => {
+        Some("logs") => {
             let number = args.get_one::<i8>("number").unwrap();
             logs::display_logs(number);
             std::process::exit(0);
         }
-        "ci" => {
+        Some("ci") => {
             assert!(roxfile.ci.is_some());
             ci::display_ci_status(roxfile.ci.unwrap()).await;
             std::process::exit(0);
         }
-        "pl" => {
-            let pipeline_map: HashMap<String, models::Pipeline> =
-                std::collections::HashMap::from_iter(
-                    roxfile
-                        .pipelines
-                        .into_iter()
-                        .flatten()
-                        .map(|pipeline| (pipeline.name.to_owned(), pipeline)),
-                );
+        Some("pl") => {
             let parallel = args.get_flag("parallel");
-            let execution_results = execute_stages(
-                &pipeline_map.get(subcommand_name).unwrap().stages,
-                &task_map,
-                parallel,
-            );
-            let results = JobResults {
-                job_name: subcommand_name.to_string(),
-                execution_time: execution_start,
-                results: execution_results.into_iter().flatten().collect(),
-            };
-            results.log_results();
-            results.display_results();
-            results.check_results();
+            let pipeline = roxfile
+                .pipelines
+                .into_iter()
+                .flatten()
+                .find(|pipeline| pipeline.name == subcommand_name)
+                .unwrap(); // Clap will catch a non-existent Pipeline for us
+            execute_pipeline(pipeline, &task_map, parallel);
         }
-        "task" => {
-            let execution_results = vec![execute_tasks(
-                vec![subcommand_name.to_string()],
-                0,
-                &task_map,
-                false,
-            )];
-            let results = JobResults {
-                job_name: subcommand_name.to_string(),
-                execution_time: execution_start,
-                results: execution_results.into_iter().flatten().collect(),
-            };
-            results.log_results();
-            results.display_results();
-            results.check_results();
-        }
+        Some("task") => execute_task(task_map.get(subcommand_name).unwrap().to_owned()),
         _ => unreachable!("Invalid subcommand"),
     };
 
