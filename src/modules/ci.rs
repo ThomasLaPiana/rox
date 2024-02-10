@@ -135,7 +135,7 @@ pub async fn display_ci_status(ci_info: CiInfo) {
         .expect("Failed to retrieve workflow data!")
         .into_iter()
         .next()
-        .unwrap();
+        .expect("Failed to retrieve workflow!");
 
     let results: Vec<RunResult> = workflow_instance
         .list_jobs(workflow.id)
@@ -144,7 +144,7 @@ pub async fn display_ci_status(ci_info: CiInfo) {
         .filter(Filter::All)
         .send()
         .await
-        .unwrap()
+        .expect("Failed to retrieve CI results!")
         .into_iter()
         .flat_map(|job| {
             let results: Vec<RunResult> = job

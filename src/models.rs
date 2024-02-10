@@ -1,9 +1,7 @@
 //! Contains the Structs for the Schema of the Roxfile
 //! as well as the validation logic.
 use crate::logs;
-use crate::modules::execution::model_injection::{
-    inject_pipeline_metadata, inject_task_metadata, inject_template_values,
-};
+use crate::modules::execution::model_injection::{inject_task_metadata, inject_template_values};
 use crate::modules::execution::output;
 use crate::utils::{color_print, ColorEnum};
 use anyhow::Result;
@@ -219,7 +217,6 @@ pub struct RoxFile {
     pub tasks: Vec<Task>,
     pub pipelines: Option<Vec<Pipeline>>,
     pub templates: Option<Vec<Template>>,
-    pub additional_files: Option<Vec<String>>,
 }
 
 impl RoxFile {
@@ -259,7 +256,16 @@ impl RoxFile {
             .collect();
 
         // Pipelines
-        roxfile.pipelines = inject_pipeline_metadata(roxfile.pipelines);
+        if let Some(mut sorted_pipelines) = roxfile.pipelines {
+            sorted_pipelines.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
+            roxfile.pipelines = Some(sorted_pipelines)
+        }
+
+        // Docs
+        if let Some(mut sorted_docs) = roxfile.docs {
+            sorted_docs.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
+            roxfile.docs = Some(sorted_docs)
+        }
 
         Ok(roxfile)
     }

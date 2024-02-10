@@ -1,16 +1,5 @@
 use crate::models;
 
-/// Inject additional metadata into each Pipeline and sort based on name.
-pub fn inject_pipeline_metadata(
-    pipelines: Option<Vec<models::Pipeline>>,
-) -> Option<Vec<models::Pipeline>> {
-    if let Some(mut some_pipelines) = pipelines {
-        some_pipelines.sort_by(|x, y| x.name.to_lowercase().cmp(&y.name.to_lowercase()));
-        return Some(some_pipelines);
-    }
-    pipelines
-}
-
 /// Get used Template's information and inject set values
 pub fn inject_template_values(mut task: models::Task, template: &models::Template) -> models::Task {
     task.command = {
