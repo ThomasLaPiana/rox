@@ -7,10 +7,6 @@ Rox is a robust developer workflow framework inspired by [Nox](https://nox.thea.
 
 Rox gives you the ability to build your own devtools CLI using YAML files, check CI pipeline statuses from your terminal, and even read documentation. Tasks and Pipelines are dynamically added to the CLI as subcommands at runtime. The flexibility of `rox` intends to makes it easier for dev teams to standardize their workflows without writing endless "glue" scripts.
 
-The subcommands and their help messages are automatically populated at runtime from the `name` and `description` of each `task` or `pipeline`.
-
-See [synthesizer](https://github.com/ThomasLaPiana/synthesizer) for an example of usage in a real project.
-
 ## Table of Contents
 
 - [Why Rox?](#why-rox)
